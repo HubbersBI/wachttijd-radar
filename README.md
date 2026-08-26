@@ -1,7 +1,12 @@
 # Wachttijd radar
 
+**Full-stack web app on live government data, with an AI assistant.**
+
 Dutch hospital waiting times, compared per treatment and per location, measured against
-the legal norm — and turned into the request your insurer is obliged to act on.
+the legal norm — and turned into the formal request your insurer is obliged to act on.
+
+`FastAPI + Next.js` · `11,325 live records from the Nederlandse Zorgautoriteit` ·
+`natural-language search` · `one Docker command` · `104 tests`
 
 ![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/01-vergelijking.png)
 
@@ -40,42 +45,35 @@ resolves to a treatment, a city and a deadline, and returns rows from the databa
 
 ## The parts worth looking at
 
-**The data is real, and there is no scraping.** The starting assumption was one
-scraper per hospital website. Checking first turned up an undocumented NZa endpoint
-serving the whole country as JSON, unauthenticated, refreshed every two weeks. The
-research that found it is in [`NOTES.md`](NOTES.md).
+**Research before building.** The plan was one scraper per hospital website. Checking
+first turned up an official NZa endpoint serving the whole country as JSON,
+unauthenticated and refreshed every two weeks — so there is no scraping anywhere in
+this project. The research is in [`NOTES.md`](NOTES.md).
 
-**The verdict has three states, because the regulation does.** TH/BR-025 sets six weeks
-for outpatient treatment and seven for inpatient — but NR/REG-2421 art. 4 lid 5 has
-providers submit both as one undifferentiated category. So a wait of 43–49 days is over
-the norm *if* it is outpatient, and within it *if* it is inpatient, and the source does
-not say which. Rather than pick one, the app reports `within`, `depends` or `exceeded`,
-and draws the uncertainty as a striped band. RIVM publishes the same figures the same
-way, for the same reason.
+**Refusing to guess.** TH/BR-025 sets six weeks for outpatient treatment and seven for
+inpatient, but NR/REG-2421 art. 4 lid 5 has providers submit both as one category. So a
+43–49 day wait is over the norm *if* it is outpatient and within it *if* it is
+inpatient, and the data cannot say which. The app reports `within`, `depends` or
+`exceeded` and draws the uncertainty as a striped band, as RIVM does with the same
+figures. A location reporting too few observations gets no number and no verdict, and
+keeps its place in the list saying so.
 
-**Absence is data.** A provider reporting too few observations gets no number, no
-verdict, no colour — and keeps its place in the list saying so. It is never quietly
-dropped, never averaged, never shown as a wait of zero. Several tests exist only to
-enforce this.
+**Constrained by design.** The assistant emits a structured query — treatment, city,
+deadline — and never prose, so it cannot invent a figure or give medical advice. The
+zorgbemiddeling letter is built in the browser and handed to the person's own mail
+client, so a name and insurer never reach the backend.
 
-**The request never reaches the server.** A zorgbemiddeling draft names someone's
-treatment and their wait: health data under AVG art. 9. It is built in the browser and
-handed to the person's own mail client, so their name and insurer never touch the
-backend. That is a guarantee rather than a retention policy.
-
-**The assistant cannot give medical advice.** It only emits a structured query —
-treatment, city, deadline — and the answer is rendered from the database. A model with
-no channel for prose cannot diagnose however it is asked, and cannot round a figure it
-never sees. Without an API key the same parse runs on rules, so the app demos and tests
-with no network.
+**Tested and runnable.** 104 tests across backend and frontend, several of which exist
+only to enforce the honesty rules above. One command starts it, and it seeds itself
+from the live API on first boot.
 
 ---
 
 ## Stack
 
 FastAPI + uv (Python 3.12) · Next.js 16 static export + React 19 + Tailwind 4 ·
-SQLite · Docker, one image, one port · pytest + vitest, 104 tests · Groq for the
-assistant, optional.
+SQLite · Docker, one image, one port · pytest + vitest · Groq for the assistant,
+optional.
 
 ## Run it
 
