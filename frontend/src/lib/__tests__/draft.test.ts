@@ -21,17 +21,8 @@ const row: Wachttijd = {
   norm_verdict: "exceeded",
 };
 
-const alternative: Wachttijd = {
-  ...row,
-  location_key: "xyz",
-  location: "Xpert Clinics Utrecht",
-  days: 30,
-  norm_verdict: "within",
-  supplied_at: "2026-08-19T08:00:00.000Z",
-};
-
 const draft = (over: Partial<Parameters<typeof buildDraft>[0]> = {}) =>
-  buildDraft({ row, norm: [42, 49], alternative: null, name: "", insurer: "", ...over });
+  buildDraft({ row, norm: [42, 49], name: "", insurer: "", ...over });
 
 describe("buildDraft", () => {
   it("cites the provider, the wait, the report date and the source", () => {
@@ -55,16 +46,9 @@ describe("buildDraft", () => {
 
   it("uses the single norm for a polikliniekbezoek", () => {
     const poli = { ...row, treatment_type: "Polikliniekbezoek", days: 40, norm_days: [28, 28] as [number, number] };
-    const text = buildDraft({ row: poli, norm: [28, 28], alternative: null, name: "", insurer: "" });
+    const text = buildDraft({ row: poli, norm: [28, 28], name: "", insurer: "" });
     expect(text).toContain("4 weken (28 dagen)");
     expect(text).toContain("12 dagen boven");
-  });
-
-  it("cites an alternative with its own report date, not today's", () => {
-    const text = draft({ alternative });
-    expect(text).toContain("Xpert Clinics Utrecht");
-    expect(text).toContain("30 dagen");
-    expect(text).toContain("19 aug 2026");
   });
 
   it("leaves visible placeholders rather than inventing a name or insurer", () => {
@@ -87,19 +71,16 @@ describe("buildDraft", () => {
   });
 });
 
-describe("buildDraft and the alternative", () => {
-  it("does not cite the provider against itself", () => {
-    const text = draft({ alternative: { ...row } });
+describe("what the request asks for", () => {
+  it("names no alternative provider - that is the insurer's job to find", () => {
+    const text = draft();
     expect(text).not.toContain("Volgens dezelfde bron");
   });
 
-  it("does not cite an alternative that is no shorter", () => {
-    const longer = { ...alternative, days: 300 };
-    expect(draft({ alternative: longer })).not.toContain("Volgens dezelfde bron");
-  });
-
-  it("cites one that is genuinely shorter and elsewhere", () => {
-    expect(draft({ alternative })).toContain("Volgens dezelfde bron");
+  it("asks for care within the norm, as close to home as possible", () => {
+    const text = draft();
+    expect(text).toContain("binnen de treeknorm terecht kan");
+    expect(text).toContain("zo dicht mogelijk bij mijn woonplaats");
   });
 });
 

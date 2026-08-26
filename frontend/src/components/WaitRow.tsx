@@ -28,15 +28,12 @@ export function WaitRow({
   row,
   longest,
   norm,
-  alternative = null,
   showCity = true,
 }: {
   row: Wachttijd;
   /** The scale maximum, which is at least the norm so the rule is always visible. */
   longest: number;
   norm?: [number, number] | null;
-  /** The shortest wait for this treatment, cited in the draft as somewhere to go. */
-  alternative?: Wachttijd | null;
   /** Hidden when the list is already filtered to one city - it would repeat every row. */
   showCity?: boolean;
 }) {
@@ -116,7 +113,6 @@ export function WaitRow({
         <DraftPanel
           row={row}
           norm={norm!}
-          alternative={alternative}
           onClose={() => setDrafting(false)}
         />
       )}

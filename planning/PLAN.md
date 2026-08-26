@@ -155,9 +155,14 @@ Nothing typed into it is written to localStorage either. Closing the panel is th
 retention policy.
 
 The draft cites the provider, the wait, the date it was reported, the source, and the
-norm with the excess computed against the reading that holds either way. Where a
-shorter wait exists elsewhere for the same treatment it cites that too, with its own
-report date - never itself, and never one that is no shorter.
+norm with the excess computed against the reading that holds either way. Then it asks
+for care within the norm as close to home as possible.
+
+**It names no alternative provider.** An earlier version cited the shortest wait in
+the list, which produced things like "0 dagen at a private clinic in Amsterdam" for
+someone in Limburg. Which provider is suitable, and how far a person can reasonably
+travel, is the insurer's obligation to work out - naming one narrows a request that
+should stay open.
 
 Name and insurer are required, and the insurer is chosen from a list of Dutch labels
 grouped by concern - people know their own brand, but the zorgplicht and the

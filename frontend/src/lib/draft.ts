@@ -16,9 +16,7 @@ import { formatDate } from "@/lib/format";
 export type DraftInput = {
   row: Wachttijd;
   norm: [number, number];
-  /** The shortest wait found for the same treatment, if any, to cite as an alternative. */
-  alternative: Wachttijd | null;
-  /** Optional, and only ever held in component state - never stored. */
+  /** Held in component state only - never stored, never sent to our server. */
   name: string;
   insurer: string;
 };
@@ -63,7 +61,7 @@ export function draftSubject(row: Wachttijd): string {
   return `Verzoek om zorgbemiddeling - ${row.treatment}`;
 }
 
-export function buildDraft({ row, norm, alternative, name, insurer }: DraftInput): string {
+export function buildDraft({ row, norm, name, insurer }: DraftInput): string {
   const days = row.days;
   if (days === null) throw new Error("Geen wachttijd om te melden");
 
@@ -84,28 +82,14 @@ export function buildDraft({ row, norm, alternative, name, insurer }: DraftInput
     normSentence(norm, days),
   ];
 
-  // Only worth citing if it is somewhere else, and shorter. Otherwise the request
-  // would point the insurer back at the provider it is complaining about.
-  const worthCiting =
-    alternative !== null &&
-    alternative.days !== null &&
-    alternative.location_key !== row.location_key &&
-    alternative.days < days;
-
-  if (worthCiting && alternative) {
-    lines.push(
-      "",
-      `Volgens dezelfde bron meldt ${placeOf(alternative)} voor dezelfde behandeling ` +
-        `een wachttijd van ${alternative.days} dagen, gemeld op ` +
-        `${formatDate(alternative.supplied_at)}.`,
-    );
-  }
-
   lines.push(
     "",
+    // Deliberately does not name an alternative. Which provider is suitable, and how
+    // far someone can reasonably travel, is the insurer's obligation to work out -
+    // naming one narrows a request that should stay open.
     "Op grond van uw zorgplicht verzoek ik u te bemiddelen naar een zorgaanbieder " +
-      "waar ik binnen de treeknorm terecht kan, en mij te laten weten wat daarvan " +
-      "het resultaat is.",
+      "waar ik wel binnen de treeknorm terecht kan, zo dicht mogelijk bij mijn " +
+      "woonplaats, en mij te laten weten wat daarvan het resultaat is.",
     "",
     "Met vriendelijke groet,",
     name.trim() || PLACEHOLDER_NAME,

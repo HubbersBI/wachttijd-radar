@@ -20,19 +20,17 @@ import { byConcern, emailFor, findInsurer } from "@/lib/insurers";
 export function DraftPanel({
   row,
   norm,
-  alternative,
   onClose,
 }: {
   row: Wachttijd;
   norm: [number, number];
-  alternative: Wachttijd | null;
   onClose: () => void;
 }) {
   const [name, setName] = useState("");
   const [insurerName, setInsurerName] = useState("");
 
   const insurer = findInsurer(insurerName);
-  const text = buildDraft({ row, norm, alternative, name, insurer: insurerName });
+  const text = buildDraft({ row, norm, name, insurer: insurerName });
   const ready = name.trim().length > 0 && insurer !== null;
 
   const mailto = insurer
