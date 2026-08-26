@@ -40,8 +40,14 @@ COLUMNS = (
 
 
 def connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
+    """Open a connection. One per request; never shared between concurrent requests.
+
+    `check_same_thread=False` is needed because FastAPI opens a generator dependency
+    on one threadpool thread and closes it on another. The connection is still only
+    ever used by one request at a time.
+    """
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
     return conn

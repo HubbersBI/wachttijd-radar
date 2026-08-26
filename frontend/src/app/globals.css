@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/*
+ * Dutch systematic design: grid, hairlines, one primary doing all the work.
+ * Cool grey-green print stock, never cream. Nothing rounded, nothing shadowed.
+ */
+@theme {
+  --color-paper: #e9ebe5;
+  --color-paper-hi: #f2f3ef;
+  --color-ink: #12161b;
+  --color-ink-dim: #5a6169;
+  --color-ink-faint: #878d84;
+  --color-rule: #c7cac1;
+  --color-rule-hi: #b0b4a9;
+  --color-measure: #1b2ed8;
+
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
+}
+
+html {
+  background: var(--color-paper);
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every figure and date is set in mono with tabular figures - the numbers are the
+   content, and columns of them must align. */
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A wait with no trustworthy number. Hatched rather than empty, so the row still
+   occupies the scale and cannot be mistaken for a wait of zero. */
+.hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-rule-hi) 0 1px,
+    transparent 1px 6px
+  );
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-measure);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

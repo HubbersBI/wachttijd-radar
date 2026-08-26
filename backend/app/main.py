@@ -1,9 +1,14 @@
 """FastAPI app. Serves /api, and later the static frontend export on the same port."""
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 
 from . import queries
 from .store import connect
+
+FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "out"
 
 app = FastAPI(title="Wachttijd-radar", version="0.1.0")
 
@@ -51,3 +56,9 @@ def wachttijden(
         "source": "Nederlandse Zorgautoriteit (NZa)",
         "results": results,
     }
+
+
+# The static frontend export, on the same port as /api. Mounted last so it never
+# shadows an API route. Absent until `npm run build` has run.
+if FRONTEND.is_dir():
+    app.mount("/", StaticFiles(directory=FRONTEND, html=True), name="frontend")

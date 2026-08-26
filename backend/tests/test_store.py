@@ -26,3 +26,24 @@ def test_insufficient_rows_are_stored_with_a_null_wait(tmp_path):
         "SELECT days FROM wachttijd WHERE insufficient_observations = 1"
     ).fetchall()
     assert flagged and all(row["days"] is None for row in flagged)
+
+
+def test_a_connection_survives_being_closed_on_another_thread(tmp_path):
+    """FastAPI opens a generator dependency on one thread and closes it on another."""
+    import threading
+
+    conn = connect(tmp_path / "threads.sqlite")
+    store(conn, SyntheticSource().fetch())
+    error: list[Exception] = []
+
+    def close_it():
+        try:
+            conn.execute("SELECT COUNT(*) FROM wachttijd").fetchone()
+            conn.close()
+        except Exception as exc:  # noqa: BLE001 - the failure is the assertion
+            error.append(exc)
+
+    thread = threading.Thread(target=close_it)
+    thread.start()
+    thread.join()
+    assert not error, error[0]
