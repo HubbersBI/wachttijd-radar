@@ -59,12 +59,10 @@ clear of by design.
 
 It uses public aggregate data only. No patient data, ever.
 
-Any login screen here is a demonstration of the pattern, not a functional
-requirement. Nothing in the app is per-person: you pick a treatment and read a
-comparison. The login gates nothing, holds no session state, uses no DigiD branding
-and accepts no real credentials. The legitimate route to DigiD runs through a
-recognised routeringsvoorziening and requires an organisation with an accepted
-aansluitaanvraag.
+**There is no login.** Nothing in the app is per-person: you pick a treatment and read
+a comparison, and a zorgbemiddeling request is a form filled fresh each time and never
+kept. A login would have gated nothing. It was in the original plan as a DigiD-style
+demo and was dropped once it became clear it had no job to do.
 
 ### Why there are no accounts, and no crowdsourced waiting times
 

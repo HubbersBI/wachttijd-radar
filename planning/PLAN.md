@@ -27,26 +27,22 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
    from the regulation, not by preference - see Treeknormen below.
 3. **Zorgbemiddeling draft.** Done. A deterministic template over the figures on
    the page, built entirely in the browser.
-4. **The AI assistant, then a DigiD-style demo login.** Both are presentation over
-   something that already works, so they come last. Both are also where the hard
-   boundaries below start to bite — read them before starting this step, not after.
-
-   The assistant is done. It takes a question in plain Dutch and returns rows: the
-   model resolves the treatment, the city and the deadline, and nothing else. Without
-   a key the same parse runs on rules, so it demos and tests with no network.
+4. **The AI assistant.** Done. It takes a question in plain Dutch and returns rows:
+   the model resolves the treatment, the city and the deadline, and nothing else.
+   Without a key the same parse runs on rules, so it demos and tests with no network.
 
    It lives in a panel that slides in from the right rather than a block in the page.
    Asking is one of two ways in and the list is the other; neither should have to
    scroll past the other. The page stays usable behind it, so it is not a modal and
    does not trap focus. Escape closes it.
 
-   **The login is a demonstration of the pattern, not a requirement.** Nothing in
-   this app is per-person: you pick a treatment and read a comparison, and the
-   zorgbemiddeling draft is a form filled fresh each time and never persisted.
-   So the login gates nothing and holds no session state. Build it because a
-   DigiD-*style* screen is the most authentic Dutch touch available and it shows
-   the pattern is understood — not because the app needs one. Do not let it grow
-   real session state without a reason that is written down here first.
+**There is no login, and there is not going to be one.** Dropped on 2026-08-26. It was
+in the original notes as a requirement without a reason, and once the reason was asked
+for there was not one: nothing in this app is per-person. You pick a treatment and read
+a comparison, and the zorgbemiddeling request is a form filled fresh each time and
+never persisted. A login would have gated nothing and held no session state — a screen
+built to demonstrate that a screen can be built. See "Accounts" below for why the
+features that would justify one are also out.
 
 ## Data flow
 
@@ -257,11 +253,11 @@ one you *publish*, which is the condition that makes most of these matter.
   what is still open.)
 - **Drafts are not persisted.** The zorgbemiddeling draft is health data about the
   person requesting it. Rendered, copied, discarded — never logged or stored.
-- **No real DigiD branding, wordmark, logo, colours or domain, and no flow that
-  accepts real credentials.** Own name, own mark, same visual family, permanent
-  demo banner. The legitimate route to real DigiD is via a recognised
-  routeringsvoorziening and needs an organisation with an accepted
-  aansluitaanvraag — worth a README sentence to show the real path is known.
+- **No DigiD, and no imitation of it.** There is no login at all, so this binds only
+  if one is ever added: no DigiD branding, wordmark, logo, colours or domain, and no
+  flow that accepts real credentials. DigiD is among the most-phished brands in the
+  Netherlands. The legitimate route runs through a recognised routeringsvoorziening
+  and needs an organisation with an accepted aansluitaanvraag.
 - **No real patient data, ever.**
 
 ## Out of v1 — decisions, not boundaries

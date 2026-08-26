@@ -10,8 +10,8 @@ against the **treeknormen**, and actionable - by drafting the
 **zorgbemiddeling** request the insurer is obliged to act on. Most people do
 not know that right exists, which is what makes the app worth building.
 
-Needs a login screen and an AI assistant. (What the login is actually for, and
-what it is not, is settled at the end of this file.)
+Needs a login screen and an AI assistant. (The assistant was built. The login was
+dropped - see the end of this file for why.)
 
 ## First decision, before anything else
 
@@ -167,16 +167,17 @@ Consumentenbond. The drafting feature rests on something real.
   one schema) and moves to where it actually bites: mapping `TreatmentType` to
   the right treeknorm, and honouring `InsufficientObservations`.
 
-### Settled 2026-08-26 - what the login is for
+### Settled 2026-08-26 - the login was dropped
 
-The line at the top of these notes asserts a login without saying why. Asked
-directly, there is no product reason: nothing in the app is per-person. You pick a
-treatment and read a comparison, and the zorgbemiddeling draft is a form filled
-fresh each time and never persisted. There is nothing to log in to.
+The line at the top of these notes asserts a login without saying why. Asked directly,
+there was no product reason: nothing in this app is per-person. You pick a treatment
+and read a comparison, and the zorgbemiddeling request is a form filled fresh each time
+and never persisted. There was nothing to log in to.
 
-The reason is the one already given further up - a DigiD-*style* screen is the most
-authentic Dutch touch available. That is a portfolio reason, and a fair one, but it
-should be called what it is: the login demonstrates the pattern. It gates nothing.
+The only remaining argument was the one further up in these notes - that a DigiD-*style*
+screen is the most authentic Dutch touch available. That is a portfolio reason, not a
+product one, and it does not survive the question "what would it gate?". A login that
+gates nothing is a screen built to prove a screen can be built. Dropped.
 
 **Crowdsourced waiting times are the feature that would justify accounts, and they
 are a stated non-goal.** Letting people report what they actually waited, against

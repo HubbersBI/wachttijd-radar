@@ -55,12 +55,12 @@ These are not preferences. Breaking one makes the app misleading or unlawful.
 - **The AI assistant never invents a figure.** Numbers come from the database and
   are passed to the model, never produced by it. The zorgbemiddeling draft is a
   deterministic template first; the model may only adjust tone.
-- **DigiD-style login must read as a demo.** No real DigiD branding, wordmark,
-  logo, colours or domain, and no flow that accepts real credentials. DigiD is
-  among the most-phished brands in the Netherlands and Logius takes down sites
-  using the name to deceive — a convincing copy is a phishing kit whatever the
-  intent. Build its own name and mark in the same visual family, with a
-  persistent demo banner.
+- **There is no login.** Dropped on 2026-08-26: nothing in this app is per-person,
+  so there was nothing to log in to. Do not add one back without a reason written
+  down here first. If one is ever added it uses no DigiD branding, wordmark, logo,
+  colours or domain, and accepts no real credentials — DigiD is among the
+  most-phished brands in the Netherlands and Logius takes down sites using the name
+  to deceive, so a convincing copy is a phishing kit whatever the intent.
 - **Cite Vektis when ggz data is used** ("bron: Vektis"). Their terms are
   personal/research use only, no commercial use, no resale. Not an open licence.
 
