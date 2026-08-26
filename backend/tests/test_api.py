@@ -106,3 +106,56 @@ def test_health_says_how_much_is_covered(client):
     for field in ("rows", "providers", "locations", "treatments"):
         assert body[field] > 0, field
     assert body["locations"] >= body["providers"]
+
+
+def test_max_days_keeps_only_locations_that_meet_the_deadline(client):
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    params = {"treatment_key": treatment["treatment_key"], "max_days": 30}
+    body = client.get("/api/wachttijden", params=params).json()
+    assert body["max_days"] == 30
+    assert body["results"], "the synthetic source has waits under 30 days"
+    for row in body["results"]:
+        assert row["days"] is not None and row["days"] <= 30
+
+
+def test_a_location_without_a_figure_is_counted_not_dropped(client):
+    """It cannot be said to meet a deadline, but the answer must not hide it."""
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    key = treatment["treatment_key"]
+    everything = client.get("/api/wachttijden", params={"treatment_key": key}).json()
+    missing = sum(1 for row in everything["results"] if row["days"] is None)
+
+    filtered = client.get(
+        "/api/wachttijden", params={"treatment_key": key, "max_days": 30}
+    ).json()
+    assert filtered["unreported"] == missing
+    assert filtered["considered"] == everything["count"]
+
+
+def test_without_max_days_nothing_is_filtered(client):
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    body = client.get(
+        "/api/wachttijden", params={"treatment_key": treatment["treatment_key"]}
+    ).json()
+    assert body["max_days"] is None
+    assert body["count"] == body["considered"]
+    assert body["unreported"] == 0
+
+
+def test_an_impossible_deadline_returns_nothing_rather_than_the_nearest_thing(client):
+    """And still says which treatment it found nothing for."""
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    body = client.get(
+        "/api/wachttijden", params={"treatment_key": treatment["treatment_key"], "max_days": 0}
+    ).json()
+    assert body["results"] == []
+    assert body["treatment"] == treatment["treatment"]
+    assert body["considered"] > 0
+
+
+def test_a_negative_deadline_is_rejected(client):
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    response = client.get(
+        "/api/wachttijden", params={"treatment_key": treatment["treatment_key"], "max_days": -5}
+    )
+    assert response.status_code == 422

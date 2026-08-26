@@ -56,18 +56,35 @@ def treatments(conn=Depends(get_conn)) -> dict:
 def wachttijden(
     treatment_key: str = Query(..., description="Identity of the treatment, from /api/treatments"),
     city: str | None = Query(None, description="Optional city filter"),
+    max_days: int | None = Query(
+        None, ge=0, description="Only locations reporting a wait of at most this many days"
+    ),
     conn=Depends(get_conn),
 ) -> dict:
-    results = queries.wachttijden(conn, treatment_key, city)
-    if not results:
+    found = queries.wachttijden(conn, treatment_key, city)
+    if not found:
         raise HTTPException(status_code=404, detail="No waiting times for that treatment")
-    treatment_type = results[0]["treatment_type"]
+    treatment_type = found[0]["treatment_type"]
+
+    # A location that reported no figure cannot be said to meet a deadline, so it is
+    # not among the results. It is counted instead: dropping it silently would make
+    # the answer look more complete than it is.
+    results = found
+    unreported = 0
+    if max_days is not None:
+        results = [row for row in found if row["days"] is not None and row["days"] <= max_days]
+        unreported = sum(1 for row in found if row["days"] is None)
     return {
         "treatment_key": treatment_key,
-        "treatment": results[0]["treatment"],
+        # From `found`, not `results`: a deadline nothing meets leaves results empty,
+        # and the answer still has to say which treatment it found nothing for.
+        "treatment": found[0]["treatment"],
         "treatment_type": treatment_type,
         "city": city,
+        "max_days": max_days,
         "count": len(results),
+        "considered": len(found),
+        "unreported": unreported,
         "source": "Nederlandse Zorgautoriteit (NZa)",
         # The norm this treatment type is judged against, in days. A pair, because
         # a behandeling may be poliklinisch (6 wk) or klinisch (7 wk) and the source
