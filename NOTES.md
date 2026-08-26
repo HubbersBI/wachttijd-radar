@@ -10,7 +10,8 @@ against the **treeknormen**, and actionable - by drafting the
 **zorgbemiddeling** request the insurer is obliged to act on. Most people do
 not know that right exists, which is what makes the app worth building.
 
-Needs a login screen and an AI assistant.
+Needs a login screen and an AI assistant. (What the login is actually for, and
+what it is not, is settled at the end of this file.)
 
 ## First decision, before anything else
 
@@ -144,3 +145,33 @@ Consumentenbond. The drafting feature rests on something real.
 - Normalisation work is smaller than feared for MSZ (one source, one unit,
   one schema) and moves to where it actually bites: mapping `TreatmentType` to
   the right treeknorm, and honouring `InsufficientObservations`.
+
+### Settled 2026-08-26 - what the login is for
+
+The line at the top of these notes asserts a login without saying why. Asked
+directly, there is no product reason: nothing in the app is per-person. You pick a
+treatment and read a comparison, and the zorgbemiddeling draft is a form filled
+fresh each time and never persisted. There is nothing to log in to.
+
+The reason is the one already given further up - a DigiD-*style* screen is the most
+authentic Dutch touch available. That is a portfolio reason, and a fair one, but it
+should be called what it is: the login demonstrates the pattern. It gates nothing.
+
+**Crowdsourced waiting times are the feature that would justify accounts, and they
+are a stated non-goal.** Letting people report what they actually waited, against
+what providers report, is genuinely valuable - providers self-report to their own
+regulator and nobody checks them. Two reasons not to:
+
+- It converts an app over public aggregate data into a register of identified people
+  and their medical waits. AVG art. 9, the AP's top enforcement priority. A DPIA, a
+  legal basis and a retention policy, not a feature.
+- The comparison would mislead. The NZa figure is a median of waits that
+  **completed**. Anyone volunteering "I have been waiting 200 days" is by definition
+  still waiting, so responses come from the long tail. Length-biased sampling makes
+  self-reported waits look systematically worse than reported ones even when every
+  provider reports honestly. The comparison is still interesting; it cannot be
+  presented as "they understated it by 44 days".
+
+The same reasoning rules out accounts in general - a saved watch on a treatment
+reveals someone's medical situation as surely as a free-text box would. Which is the
+useful finding: in this app, nearly every use of an account lands in art. 9.

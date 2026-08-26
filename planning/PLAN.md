@@ -31,6 +31,14 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
    after. The assistant's input contract is structured parameters; if a design
    for it needs a free-text box, the design is wrong.
 
+   **The login is a demonstration of the pattern, not a requirement.** Nothing in
+   this app is per-person: you pick a treatment and read a comparison, and the
+   zorgbemiddeling draft is a form filled fresh each time and never persisted.
+   So the login gates nothing and holds no session state. Build it because a
+   DigiD-*style* screen is the most authentic Dutch touch available and it shows
+   the pattern is understood — not because the app needs one. Do not let it grow
+   real session state without a reason that is written down here first.
+
 ## Data flow
 
 ```
@@ -160,4 +168,20 @@ These could change. The ones above cannot.
 - Commercial use of Vektis data — blocked by their licence for as long as ggz data
   is in the app at all.
 - Snapshot history as a visible feature. The schema records it from day one; no
-  screen shows it in v1.
+  screen shows it in v1. Tried once and reverted: the run of past reports is not
+  what someone facing a waiting time needs, and it crowded the current figure.
+- **Accounts, and crowdsourced waiting times.** The obvious feature — let people
+  report what they actually waited, and compare it against what providers report —
+  is deliberately not built. Two reasons, and the second is the one people miss:
+  - It converts an app over public aggregate data into a register of identified
+    people and their medical waits. AVG art. 9, top enforcement priority. That is
+    a DPIA and a retention policy, not a feature.
+  - The comparison would mislead. The NZa figure is a median of waits that
+    **completed**; anyone volunteering "I have been waiting 200 days" is by
+    definition still waiting. Length-biased sampling makes self-reported waits look
+    systematically worse than reported ones even when every provider is honest.
+
+  The same reasoning rules out accounts generally: a saved watch on a treatment
+  reveals someone's medical situation as surely as a free-text box would. This sits
+  here rather than under the hard boundaries because it *could* change — but only
+  deliberately, with the compliance work done first.

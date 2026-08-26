@@ -59,8 +59,30 @@ clear of by design.
 
 It uses public aggregate data only. No patient data, ever.
 
-Any login screen here is a demonstration. It does not use DigiD branding and accepts
-no real credentials; the legitimate route to DigiD runs through a recognised
-routeringsvoorziening and requires an organisation with an accepted aansluitaanvraag.
+Any login screen here is a demonstration of the pattern, not a functional
+requirement. Nothing in the app is per-person: you pick a treatment and read a
+comparison. The login gates nothing, holds no session state, uses no DigiD branding
+and accepts no real credentials. The legitimate route to DigiD runs through a
+recognised routeringsvoorziening and requires an organisation with an accepted
+aansluitaanvraag.
+
+### Why there are no accounts, and no crowdsourced waiting times
+
+The obvious next feature is to let people report what they actually waited and
+compare it against what providers report. It is deliberately not built.
+
+Collecting that turns an app over public aggregate data into a register of
+identified people and their medical waits - special category data under AVG art. 9,
+and the Dutch DPA's top enforcement priority. That is a different project, with a
+DPIA, a legal basis and a retention policy, not a feature.
+
+The comparison would also mislead. The NZa figure is a median of waits that
+**completed**. Anyone volunteering "I have been waiting 200 days" is by definition
+still waiting, so responses are drawn from the long tail. Length-biased sampling
+makes self-reported waits look systematically worse than reported ones even when
+every provider reports honestly.
+
+The same reasoning rules out accounts generally. A saved watch on a treatment
+reveals someone's medical situation as surely as a free-text box would.
 
 `CLAUDE.md` holds the full invariants and `planning/PLAN.md` the shape of the build.
