@@ -25,7 +25,13 @@ export type Wachttijd = {
   supplied_at: string;
   /** When we pulled it. */
   fetched_at: string;
+  /** The norm in days: [strictest, most lenient]. A pair when the source cannot say. */
+  norm_days: [number, number] | null;
+  /** "within" | "exceeded" | "depends". Null when there is no wait to judge. */
+  norm_verdict: Verdict | null;
 };
+
+export type Verdict = "within" | "exceeded" | "depends";
 
 export type WachttijdenResponse = {
   treatment_key: string;
@@ -34,6 +40,8 @@ export type WachttijdenResponse = {
   city: string | null;
   count: number;
   source: string;
+  norm_days: [number, number] | null;
+  norm_source: string;
   results: Wachttijd[];
 };
 

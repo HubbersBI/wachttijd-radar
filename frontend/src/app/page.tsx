@@ -7,7 +7,7 @@ import { Scale } from "@/components/Scale";
 import { WaitRow } from "@/components/WaitRow";
 import type { Health, Treatment, WachttijdenResponse } from "@/lib/api";
 import { getHealth, getTreatments, getWachttijden } from "@/lib/api";
-import { formatDate } from "@/lib/format";
+import { formatDate, normLabel } from "@/lib/format";
 
 export default function Page() {
   const [health, setHealth] = useState<Health | null>(null);
@@ -49,6 +49,13 @@ export default function Page() {
   const measured = rows.filter((row) => row.days !== null);
   const longest = measured.length ? Math.max(...measured.map((row) => row.days!)) : 0;
   const shortest = measured.length ? Math.min(...measured.map((row) => row.days!)) : 0;
+
+  // The scale always reaches the norm, so the marker is on screen even when every
+  // location in view is comfortably inside it.
+  const norm = data?.norm_days ?? null;
+  const scaleMax = Math.max(longest, norm ? norm[1] : 0);
+  const over = rows.filter((row) => row.norm_verdict === "exceeded").length;
+  const ambiguous = rows.filter((row) => row.norm_verdict === "depends").length;
 
   return (
     <div className="mx-auto min-h-screen max-w-4xl px-6 pb-24">
@@ -114,14 +121,28 @@ export default function Page() {
             {measured.length > 0 && ` · ${shortest} tot ${longest} dagen`}
           </p>
 
-          <div className="mt-8">
-            <Scale longest={longest} />
+          {norm && over > 0 && (
+            <p className="mt-4 max-w-2xl border-l-2 border-ink pl-4 text-[15px] leading-relaxed">
+              <strong className="font-semibold">
+                {over} van de {rows.length} {rows.length === 1 ? "locatie" : "locaties"}
+                {over === 1 ? " zit" : " zitten"} boven de treeknorm
+              </strong>{" "}
+              van {normLabel(norm)}. Bij een wachttijd boven de treeknorm kunt u uw
+              zorgverzekeraar om zorgbemiddeling vragen. Dat is kosteloos.
+              {ambiguous > 0 &&
+                ` Nog ${ambiguous} ${ambiguous === 1 ? "locatie valt" : "locaties vallen"} in de marge tussen 6 en 7 weken: de bron meldt niet of de behandeling poliklinisch of klinisch is.`}
+            </p>
+          )}
+
+          <div className="mt-10">
+            <Scale longest={scaleMax} norm={norm} />
             <ol className="mt-2">
               {rows.map((row) => (
                 <WaitRow
                   key={row.location_key}
                   row={row}
-                  longest={longest}
+                  longest={scaleMax}
+                  norm={norm}
                   showCity={!city}
                 />
               ))}

@@ -73,10 +73,19 @@ Facts that are easy to get wrong:
 - Covers **medisch-specialistische zorg only**. There is no ggz endpoint;
   `WaitingTimeGGZ` returns 404. Ggz comes later, from Vektis, under the terms above.
 
-Treeknormen: polikliniekbezoek 4 wk, diagnostiek 4 wk, poliklinische behandeling
-6 wk, klinische behandeling 7 wk. `TreatmentType: Behandeling` does not say whether
-it is poliklinisch or klinisch — see the open questions in `NOTES.md`. Do not
-silently pick one norm.
+Treeknormen (TH/BR-025) live in `app/treeknorm.py`, in code and never in the
+database: polikliniekbezoek 4 wk, diagnostiek 4 wk, poliklinische behandeling 6 wk,
+klinische behandeling 7 wk.
+
+`TreatmentType: Behandeling` does not say whether it is poliklinisch or klinisch, and
+NR/REG-2421 art. 4 lid 5 submits both as one category, so **the norm for a behandeling
+is the range 42–49 days and the verdict has three states**: within under either
+reading, over under either reading, or `depends` in the 43–49 band. RIVM publishes the
+same figures the same way. Never collapse that band to one norm.
+
+The norm binds the **insurer**, not the provider. TH/BR-025 is the toezichtkader for
+the zorgplicht; exceeding the norm is what entitles someone to zorgbemiddeling. Say
+that, and do not accuse a hospital of breaking a rule it is not bound by.
 
 Respect the source: rate-limit, cache to disk, identify the client with a real
 User-Agent. Never hammer the API in a loop during development; work from the

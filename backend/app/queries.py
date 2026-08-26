@@ -7,6 +7,8 @@ times, once per report.
 
 import sqlite3
 
+from . import treeknorm
+
 LATEST_PER_LOCATION = """
 SELECT location_key, care_provider, location, postal_code, city,
        treatment_key, treatment, treatment_type, specialism,
@@ -64,6 +66,8 @@ def _row(row: sqlite3.Row) -> dict:
     out = dict(row)
     out.pop("rn", None)
     out["insufficient_observations"] = bool(out["insufficient_observations"])
+    out["norm_days"] = treeknorm.norm_for(out["treatment_type"])
+    out["norm_verdict"] = treeknorm.verdict(out["treatment_type"], out["days"])
     return out
 
 

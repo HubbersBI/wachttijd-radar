@@ -1,3 +1,4 @@
+import { NormBand } from "@/components/NormMarker";
 import type { Wachttijd } from "@/lib/api";
 import { barWidth, formatDate, formatWait } from "@/lib/format";
 
@@ -14,10 +15,14 @@ import { barWidth, formatDate, formatWait } from "@/lib/format";
 export function WaitRow({
   row,
   longest,
+  norm,
   showCity = true,
 }: {
   row: Wachttijd;
+  /** The scale maximum, which is at least the norm so the marker is always visible. */
   longest: number;
+  /** The treeknorm, marked in the track so every row shares one line. */
+  norm?: [number, number] | null;
   /** Hidden when the list is already filtered to one city - it would repeat every row. */
   showCity?: boolean;
 }) {
@@ -35,10 +40,11 @@ export function WaitRow({
       </div>
 
       <div className="relative mt-1.5 h-[18px]">
+        {norm && <NormBand norm={norm} scaleMax={longest} />}
         {unknown ? (
           <>
             <div className="hatch absolute inset-y-0 left-0 w-[9%] border border-rule-hi" />
-            <span className="tabular absolute top-1/2 left-[9%] -translate-y-1/2 pl-2 text-[12px] text-ink-faint">
+            <span className="tabular absolute top-1/2 left-[9%] z-20 -translate-y-1/2 bg-paper px-2 text-[12px] text-ink-faint">
               onvoldoende waarnemingen
             </span>
           </>
@@ -49,8 +55,8 @@ export function WaitRow({
               style={{ width }}
             />
             <span
-              className={`tabular absolute top-1/2 -translate-y-1/2 text-[12px] transition-[left,right] duration-500 ease-out ${
-                insideBar ? "pr-2 text-paper" : "pl-2 text-ink"
+              className={`tabular absolute top-1/2 z-20 -translate-y-1/2 text-[12px] transition-[left,right] duration-500 ease-out ${
+                insideBar ? "bg-measure px-2 text-paper" : "bg-paper px-2 text-ink"
               }`}
               style={insideBar ? { right: `calc(100% - ${width})` } : { left: width }}
             >

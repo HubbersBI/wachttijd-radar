@@ -22,8 +22,9 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
 
 1. **Fetch → store → show.** The honest slice: pull the API, normalise into SQLite,
    one ranked screen. No login, no AI, no ggz. This proves the app is real.
-2. **Treeknorm check.** Only after TH/BR-025 is read and the two open questions in
-   `NOTES.md` are answered. Until then, show the wait without a verdict.
+2. **Treeknorm check.** Done. The norm is marked on the same scale as the bars and
+   the list says how many locations sit past it. The mapping question was answered
+   from the regulation, not by preference - see Treeknormen below.
 3. **Zorgbemiddeling draft.** Deterministic template over stored figures.
 4. **DigiD-style demo login, then the AI assistant.** Both are presentation over
    something that already works, so they come last. Both are also where the hard
@@ -82,7 +83,8 @@ is how a wait can be shown moving over time later.
 insufficient there is no number, and the absence must survive to the UI rather than
 being filled with a zero or an average.
 
-Treeknormen live in code, not in the database. They are policy, not data.
+Treeknormen live in code (`app/treeknorm.py`), not in the database. They are policy,
+not data.
 
 ## API
 
@@ -95,8 +97,32 @@ GET /api/wachttijden?treatment_key=&city=    -> ranked rows, each carrying its o
 ```
 
 Every row returned by `/api/wachttijden` carries `days`, `treatment_type`,
-`insufficient_observations`, `supplied_at` and `fetched_at`. The frontend is never
-handed a bare number.
+`insufficient_observations`, `supplied_at`, `fetched_at`, `norm_days` and
+`norm_verdict`. The frontend is never handed a bare number.
+
+## Treeknormen
+
+Source: NZa Beleidsregel toezichtkader zorgplicht zorgverzekeraars Zvw (TH/BR-025).
+
+| Type | Norm | Verdict |
+| --- | --- | --- |
+| Polikliniekbezoek | 28 days | within / exceeded |
+| Diagnostiek | 28 days | within / exceeded |
+| Behandeling | 42–49 days | within / **depends** / exceeded |
+
+**Behandeling is a range on purpose.** TH/BR-025 sets 6 weeks for poliklinische and 7
+for klinische behandeling, but NR/REG-2421 art. 4 lid 5 has providers submit treatment
+waiting times as one undifferentiated category. The distinction is absent from the
+source, so a wait of 43–49 days is `depends`: over the norm if poliklinisch, within it
+if klinisch. RIVM/VZinfo publishes the same figures against "6 of 7 weken" for the
+same reason. Never collapse the band to a single norm.
+
+A row with no number gets no verdict. Judging a wait we do not have would be worse
+than showing none.
+
+**The norm binds the insurer, not the provider.** TH/BR-025 is the toezichtkader for
+the zorgplicht. Exceeding the norm is what entitles someone to free zorgbemiddeling -
+it is not a rule the hospital broke, and the interface must not say it is.
 
 **Treatments are identified by `treatment_key`, never by name.** Four keys carry more
 than one name because the label was revised over time ("Anti-snurkbehandeling" became

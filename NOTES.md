@@ -118,15 +118,36 @@ website problem the notes assumed is already solved for MSZ.
 | Klinische behandeling | 7 wk / 49 d | 5 wk |
 | Huisarts | 3 werkdagen | 2 werkdagen |
 
-**Open question, resolve before coding the norm check:** ggz reporting commonly
-quotes aanmeld 4 wk + behandel 10 wk = totaal 14 wk, which does not match
-TH/BR-025's 4/6/7. Different measurement start points. Read TH/BR-025 directly
-and pick one, explicitly.
+**Open question, deferred with ggz:** ggz reporting commonly quotes aanmeld 4 wk +
+behandel 10 wk = totaal 14 wk, which does not match TH/BR-025's 4/6/7. Different
+measurement start points. This does not block v1 - ggz is out of scope - and must be
+settled before any ggz adapter is written.
 
-**Second open question:** the NZa `TreatmentType` value `Behandeling` does not
-say whether it is poliklinisch (6 wk) or klinisch (7 wk). Do not silently pick
-one. Either map per `Treatment` where it is unambiguous, or compare against the
-6-week norm and label the 7-week case as not distinguishable in the source.
+**Second open question - resolved 2026-08-26, and not by preference.** The NZa
+`TreatmentType` value `Behandeling` does not say whether it is poliklinisch (6 wk) or
+klinisch (7 wk). Checked the regulation rather than guessing:
+
+- **NR/REG-2421 art. 4 lid 5** has providers submit treatment waiting times for the
+  behandelingen in bijlage 1 as **one undifferentiated category**. The distinction is
+  genuinely absent from the source, not missing from our mapping.
+- **RIVM/VZinfo publishes these same figures against "een treeknorm van 6 of 7
+  weken"** - the national statistics body declines to pick one too.
+
+So the norm for a behandeling is reported as a **range**, and the verdict has three
+states rather than two:
+
+| Wait | Verdict |
+| --- | --- |
+| <= 42 days | within the norm under either reading |
+| 43-49 days | depends on poliklinisch or klinisch, which the source does not say |
+| > 49 days | over the norm under either reading |
+
+Polikliniekbezoek and diagnostiek are unambiguous at 28 days.
+
+Note what the norm binds: TH/BR-025 is the toezichtkader for the **insurer's**
+zorgplicht, not a rule the hospital breaks. Exceeding it is what entitles someone to
+ask their insurer for zorgbemiddeling. The interface says that, and does not accuse
+the provider of anything.
 
 ### Zorgbemiddeling - premise confirmed
 

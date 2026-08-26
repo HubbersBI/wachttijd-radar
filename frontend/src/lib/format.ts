@@ -34,3 +34,23 @@ export function axisTicks(longest: number, count = 5): number[] {
   for (let value = 0; value <= longest; value += step) ticks.push(value);
   return ticks;
 }
+
+/**
+ * The norm in weeks, as a label.
+ *
+ * A behandeling shows "6 of 7 weken" because TH/BR-025 sets 6 weeks for poliklinische
+ * and 7 for klinische behandeling, while the source submits both as one category and
+ * does not say which. RIVM publishes the same figures the same way.
+ */
+export function normLabel(norm: [number, number]): string {
+  const [strict, lenient] = norm;
+  const weeks = (days: number) => days / 7;
+  return strict === lenient
+    ? `${weeks(strict)} weken`
+    : `${weeks(strict)} of ${weeks(lenient)} weken`;
+}
+
+/** Position on the scale as a percentage, for the norm marker. */
+export function scalePosition(days: number, scaleMax: number): string {
+  return `${Math.min(100, (days / scaleMax) * 100)}%`;
+}

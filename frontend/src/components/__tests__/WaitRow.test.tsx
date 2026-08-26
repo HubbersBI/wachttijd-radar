@@ -18,6 +18,8 @@ const base: Wachttijd = {
   insufficient_observations: false,
   supplied_at: "2026-08-18T08:00:00.000Z",
   fetched_at: "2026-08-26T09:00:00+00:00",
+  norm_days: [42, 49],
+  norm_verdict: "exceeded",
 };
 
 describe("WaitRow", () => {
@@ -28,7 +30,12 @@ describe("WaitRow", () => {
   });
 
   it("says so when there is no trustworthy number, instead of showing one", () => {
-    const unknown = { ...base, days: null, insufficient_observations: true };
+    const unknown = {
+      ...base,
+      days: null,
+      insufficient_observations: true,
+      norm_verdict: null,
+    };
     render(<WaitRow row={unknown} longest={256} />);
     expect(screen.getByText("onvoldoende waarnemingen")).toBeInTheDocument();
     expect(screen.queryByText(/dagen/)).not.toBeInTheDocument();
@@ -36,7 +43,12 @@ describe("WaitRow", () => {
   });
 
   it("keeps the reported date on a row that has no number", () => {
-    const unknown = { ...base, days: null, insufficient_observations: true };
+    const unknown = {
+      ...base,
+      days: null,
+      insufficient_observations: true,
+      norm_verdict: null,
+    };
     render(<WaitRow row={unknown} longest={256} />);
     expect(screen.getByText(/gemeld 18 aug 2026/)).toBeInTheDocument();
   });

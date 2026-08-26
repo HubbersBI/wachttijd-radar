@@ -65,3 +65,28 @@ def test_rows_without_a_number_are_kept_and_sorted_last(client):
 
 def test_unknown_treatment_is_a_404(client):
     assert client.get("/api/wachttijden", params={"treatment_key": "nope"}).status_code == 404
+
+
+def test_every_row_carries_its_norm_and_verdict(client):
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    body = client.get(
+        "/api/wachttijden", params={"treatment_key": treatment["treatment_key"]}
+    ).json()
+    assert body["norm_days"], "the response states the norm the list is judged against"
+    assert "TH/BR-025" in body["norm_source"]
+    for row in body["results"]:
+        assert row["norm_days"] == body["norm_days"]
+        if row["days"] is None:
+            assert row["norm_verdict"] is None, "no verdict without a number"
+        else:
+            assert row["norm_verdict"] in {"within", "exceeded", "depends"}
+
+
+def test_a_row_without_a_number_never_gets_a_verdict(client):
+    """Judging a wait we do not have would be worse than showing no verdict."""
+    for treatment in client.get("/api/treatments").json()["treatments"]:
+        rows = client.get(
+            "/api/wachttijden", params={"treatment_key": treatment["treatment_key"]}
+        ).json()["results"]
+        for row in rows:
+            assert (row["norm_verdict"] is None) == (row["days"] is None)

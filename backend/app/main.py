@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 
-from . import queries
+from . import queries, treeknorm
 from .store import connect
 
 # The built frontend: `backend/static` in the image, `frontend/out` in a checkout.
@@ -58,13 +58,19 @@ def wachttijden(
     results = queries.wachttijden(conn, treatment_key, city)
     if not results:
         raise HTTPException(status_code=404, detail="No waiting times for that treatment")
+    treatment_type = results[0]["treatment_type"]
     return {
         "treatment_key": treatment_key,
         "treatment": results[0]["treatment"],
-        "treatment_type": results[0]["treatment_type"],
+        "treatment_type": treatment_type,
         "city": city,
         "count": len(results),
         "source": "Nederlandse Zorgautoriteit (NZa)",
+        # The norm this treatment type is judged against, in days. A pair, because
+        # a behandeling may be poliklinisch (6 wk) or klinisch (7 wk) and the source
+        # does not say which.
+        "norm_days": treeknorm.norm_for(treatment_type),
+        "norm_source": "NZa Beleidsregel toezichtkader zorgplicht zorgverzekeraars (TH/BR-025)",
         "results": results,
     }
 

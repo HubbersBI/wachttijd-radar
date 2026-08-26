@@ -1,3 +1,4 @@
+import { NormLabel } from "@/components/NormMarker";
 import { axisTicks } from "@/lib/format";
 
 /**
@@ -7,11 +8,20 @@ import { axisTicks } from "@/lib/format";
  * The treeknorm becomes a marked position on this axis once the norm mapping in
  * NOTES.md is settled - the scale is built to receive it.
  */
-export function Scale({ longest }: { longest: number }) {
+export function Scale({
+  longest,
+  norm,
+}: {
+  longest: number;
+  norm?: [number, number] | null;
+}) {
   const ticks = axisTicks(longest);
 
   return (
     <div className="relative select-none pt-1" aria-hidden="true">
+      <div className="relative h-4">
+        {norm && <NormLabel norm={norm} scaleMax={longest} />}
+      </div>
       <div className="relative h-3">
         {ticks.map((tick) => (
           <span
