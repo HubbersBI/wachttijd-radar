@@ -27,11 +27,13 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
    from the regulation, not by preference - see Treeknormen below.
 3. **Zorgbemiddeling draft.** Done. A deterministic template over the figures on
    the page, built entirely in the browser.
-4. **DigiD-style demo login, then the AI assistant.** Both are presentation over
+4. **The AI assistant, then a DigiD-style demo login.** Both are presentation over
    something that already works, so they come last. Both are also where the hard
-   boundaries below start to bite — read them before starting this step, not
-   after. The assistant's input contract is structured parameters; if a design
-   for it needs a free-text box, the design is wrong.
+   boundaries below start to bite — read them before starting this step, not after.
+
+   The assistant is done. It takes a question in plain Dutch and returns rows: the
+   model resolves the treatment, the city and the deadline, and nothing else. Without
+   a key the same parse runs on rules, so it demos and tests with no network.
 
    **The login is a demonstration of the pattern, not a requirement.** Nothing in
    this app is per-person: you pick a treatment and read a comparison, and the
@@ -239,9 +241,15 @@ one you *publish*, which is the condition that makes most of these matter.
 
 - **No symptom checking, triage, or advice on what care someone needs.** MDR and
   EU AI Act. The app navigates and drafts; it never assesses.
-- **No free text reaches the model.** The assistant is handed structured
-  parameters, never a sentence the user wrote. Anything a user types about their
-  own health is AVG art. 9 data, and this keeps it out of a third-party LLM.
+- **The model only emits a query, never prose.** Treatment key, city, deadline -
+  and the answer is then built from the database. This is what keeps the app behind
+  the diagnosis line: a model with no channel for prose cannot give medical advice
+  however it is asked. It is also what keeps every figure honest, since there is
+  nothing for it to round.
+- **Nothing travels with the question.** No name, no insurer, no draft, no session.
+  The question itself is never logged or stored. (The rule that no free text reached
+  the model at all was lifted on 2026-08-26 - see CLAUDE.md for what replaced it and
+  what is still open.)
 - **Drafts are not persisted.** The zorgbemiddeling draft is health data about the
   person requesting it. Rendered, copied, discarded — never logged or stored.
 - **No real DigiD branding, wordmark, logo, colours or domain, and no flow that
@@ -273,6 +281,8 @@ These could change. The ones above cannot.
     systematically worse than reported ones even when every provider is honest.
 
   The same reasoning rules out accounts generally: a saved watch on a treatment
-  reveals someone's medical situation as surely as a free-text box would. This sits
-  here rather than under the hard boundaries because it *could* change — but only
-  deliberately, with the compliance work done first.
+  reveals someone's medical situation just as plainly as the assistant's question
+  box. The difference is persistence — a question is answered and gone, a watch has
+  to be stored against a person to be a watch at all. This sits here rather than
+  under the hard boundaries because it *could* change, but only deliberately, with
+  the compliance work done first.

@@ -194,5 +194,8 @@ regulator and nobody checks them. Two reasons not to:
   presented as "they understated it by 44 days".
 
 The same reasoning rules out accounts in general - a saved watch on a treatment
-reveals someone's medical situation as surely as a free-text box would. Which is the
-useful finding: in this app, nearly every use of an account lands in art. 9.
+reveals someone's medical situation just as plainly as the assistant's question box.
+The difference is persistence: a question is answered and gone, while a watch has to
+be stored against a person to be a watch at all. Which is the useful finding: in this
+app, nearly every use of an account lands in art. 9, and the line that holds is
+whether anything is kept.

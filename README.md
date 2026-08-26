@@ -82,7 +82,10 @@ still waiting, so responses are drawn from the long tail. Length-biased sampling
 makes self-reported waits look systematically worse than reported ones even when
 every provider reports honestly.
 
-The same reasoning rules out accounts generally. A saved watch on a treatment
-reveals someone's medical situation as surely as a free-text box would.
+The same reasoning rules out accounts generally. A saved watch on a treatment reveals
+someone's medical situation just as plainly as the assistant's question box does. The
+difference is that the question is transient - answered, shown, and gone - while a
+watch has to be stored against a person to be a watch at all. Storing it is the part
+this app does not do.
 
 `CLAUDE.md` holds the full invariants and `planning/PLAN.md` the shape of the build.
