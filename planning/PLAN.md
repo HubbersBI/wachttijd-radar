@@ -81,14 +81,23 @@ Treeknormen live in code, not in the database. They are policy, not data.
 Step 1 needs three endpoints.
 
 ```
-GET /api/health
+GET /api/health                              -> row count, fetched_at, newest report
 GET /api/treatments                          -> treatments + specialisms, for the picker
-GET /api/wachttijden?treatment=&city=        -> ranked rows, each carrying its own dates
+GET /api/wachttijden?treatment_key=&city=    -> ranked rows, each carrying its own dates
 ```
 
 Every row returned by `/api/wachttijden` carries `days`, `treatment_type`,
 `insufficient_observations`, `supplied_at` and `fetched_at`. The frontend is never
 handed a bare number.
+
+**Treatments are identified by `treatment_key`, never by name.** Four keys carry more
+than one name because the label was revised over time ("Anti-snurkbehandeling" became
+"Behandeling vanwege apneu"). Grouping by name would split one treatment across two
+lists and hide providers from the comparison, which is the failure this app exists to
+prevent.
+
+Reads always resolve to the latest report per location and treatment. The table is a
+history; without that, a provider would appear once per report it has ever filed.
 
 ## The screen
 
