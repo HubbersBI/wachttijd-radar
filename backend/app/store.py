@@ -3,12 +3,37 @@
 Normalisation happens on write, never in the read path.
 """
 
+import os
 import sqlite3
 from pathlib import Path
 
 from .sources.base import Wachttijd
 
-DB_PATH = Path(__file__).resolve().parents[2] / "db" / "wachttijden.sqlite"
+# WACHTTIJD_DB_DIR is the mounted volume in the container; a checkout uses db/.
+DB_DIR = Path(
+    os.environ.get("WACHTTIJD_DB_DIR", Path(__file__).resolve().parents[2] / "db")
+)
+
+
+def default_db_path() -> Path:
+    """Where the database lives.
+
+    Each source gets its own file. Synthetic rows must never land in the same table
+    as reported ones: once mixed there is no way to tell an invented number from a
+    number a hospital actually filed.
+
+    WACHTTIJD_DB overrides the whole path; WACHTTIJD_DB_DIR overrides the directory
+    while keeping the per-source filename.
+    """
+    override = os.environ.get("WACHTTIJD_DB")
+    if override:
+        return Path(override)
+    directory = Path(os.environ.get("WACHTTIJD_DB_DIR", DB_DIR))
+    synthetic = os.environ.get("WACHTTIJD_SOURCE", "nza").lower() == "synthetic"
+    return directory / ("synthetic.sqlite" if synthetic else "wachttijden.sqlite")
+
+
+DB_PATH = default_db_path()
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS wachttijd (
@@ -39,13 +64,14 @@ COLUMNS = (
 )
 
 
-def connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
+def connect(db_path: Path | None = None) -> sqlite3.Connection:
     """Open a connection. One per request; never shared between concurrent requests.
 
     `check_same_thread=False` is needed because FastAPI opens a generator dependency
     on one threadpool thread and closes it on another. The connection is still only
     ever used by one request at a time.
     """
+    db_path = db_path or default_db_path()
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row

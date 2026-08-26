@@ -8,7 +8,18 @@ from fastapi.staticfiles import StaticFiles
 from . import queries
 from .store import connect
 
-FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "out"
+# The built frontend: `backend/static` in the image, `frontend/out` in a checkout.
+FRONTEND = next(
+    (
+        path
+        for path in (
+            Path(__file__).resolve().parents[1] / "static",
+            Path(__file__).resolve().parents[2] / "frontend" / "out",
+        )
+        if path.is_dir()
+    ),
+    None,
+)
 
 app = FastAPI(title="Wachttijd-radar", version="0.1.0")
 
@@ -60,5 +71,5 @@ def wachttijden(
 
 # The static frontend export, on the same port as /api. Mounted last so it never
 # shadows an API route. Absent until `npm run build` has run.
-if FRONTEND.is_dir():
+if FRONTEND:
     app.mount("/", StaticFiles(directory=FRONTEND, html=True), name="frontend")

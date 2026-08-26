@@ -120,6 +120,19 @@ The synthetic path is a convenience, not a fallback the app depends on. If the r
 adapter breaks, the app says the data is stale; it does not quietly serve invented
 numbers.
 
+**Each source writes its own database file.** Synthetic rows must never land in the
+table of reported ones - once mixed, an invented number is indistinguishable from a
+number a hospital actually filed.
+
+Environment:
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `WACHTTIJD_SOURCE` | `nza` | `synthetic` runs the offline generator |
+| `WACHTTIJD_DB_DIR` | `db/` | Directory for the database; the volume in the container |
+| `WACHTTIJD_DB` | unset | Full path override, wins over both |
+| `WACHTTIJD_PORT` | `8000` | Host port for docker compose |
+
 ## Hard boundaries
 
 Absolute. Not softened by this being a portfolio project — a portfolio project is

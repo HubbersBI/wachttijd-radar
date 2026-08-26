@@ -1,0 +1,31 @@
+# Git and CI
+.git
+.github
+.gitignore
+
+# Local state - the container has its own database volume
+db/
+.env
+
+# Docs, planning and tests are not needed in the image
+planning/
+scripts/
+README.md
+NOTES.md
+CLAUDE.md
+LICENSE
+.claude/
+.playwright-mcp/
+
+# Frontend build artefacts and dependencies (rebuilt in the image)
+frontend/node_modules
+frontend/out
+frontend/.next
+frontend/*.tsbuildinfo
+
+# Backend local state
+backend/.venv
+backend/tests
+backend/**/__pycache__
+backend/.pytest_cache
+backend/.ruff_cache

@@ -1,0 +1,25 @@
+# Convenience wrapper around the same image, volume, and port the scripts use.
+#   docker compose up --build -d
+#   docker compose down          (keeps the named volume, so the data survives)
+#
+# The host port is WACHTTIJD_PORT, default 8000. Set it if something else already
+# holds that port:  WACHTTIJD_PORT=8001 docker compose up -d
+
+services:
+  app:
+    build: .
+    image: wachttijd-radar
+    container_name: wachttijd-radar
+    ports:
+      - "${WACHTTIJD_PORT:-8000}:8000"
+    environment:
+      # Set to "synthetic" to run the demo without calling the NZa API.
+      WACHTTIJD_SOURCE: "${WACHTTIJD_SOURCE:-nza}"
+    volumes:
+      - wachttijd-radar-data:/app/db
+    restart: unless-stopped
+
+volumes:
+  wachttijd-radar-data:
+    # Explicit name so compose and `docker run` share one volume.
+    name: wachttijd-radar-data

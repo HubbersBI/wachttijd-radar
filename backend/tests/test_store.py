@@ -47,3 +47,21 @@ def test_a_connection_survives_being_closed_on_another_thread(tmp_path):
     thread.start()
     thread.join()
     assert not error, error[0]
+
+
+def test_synthetic_rows_never_share_a_database_with_reported_ones(monkeypatch):
+    """Once mixed, an invented number is indistinguishable from a reported one."""
+    from app.store import default_db_path
+
+    monkeypatch.setenv("WACHTTIJD_SOURCE", "nza")
+    real = default_db_path()
+    monkeypatch.setenv("WACHTTIJD_SOURCE", "synthetic")
+    synthetic = default_db_path()
+    assert real != synthetic
+
+
+def test_an_explicit_database_path_wins(monkeypatch, tmp_path):
+    from app.store import default_db_path
+
+    monkeypatch.setenv("WACHTTIJD_DB", str(tmp_path / "chosen.sqlite"))
+    assert default_db_path() == tmp_path / "chosen.sqlite"
