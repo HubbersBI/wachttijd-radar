@@ -38,6 +38,9 @@ def health(conn=Depends(get_conn)) -> dict:
     return {
         "status": "ok" if freshness["rows"] else "empty",
         "rows": freshness["rows"],
+        "providers": freshness["providers"],
+        "locations": freshness["locations"],
+        "treatments": freshness["treatments"],
         "fetched_at": freshness["fetched_at"],
         "latest_report": freshness["supplied_at"],
         "source": "NZa Zorgbeeld open API (medisch-specialistische zorg)",

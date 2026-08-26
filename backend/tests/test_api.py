@@ -98,3 +98,11 @@ def test_treatments_carry_the_norm_they_are_judged_against(client):
         assert treatment["norm_days"], treatment["treatment"]
         strict, lenient = treatment["norm_days"]
         assert strict <= lenient
+
+
+def test_health_says_how_much_is_covered(client):
+    """The page shows these; a tool that states its coverage is easier to trust."""
+    body = client.get("/api/health").json()
+    for field in ("rows", "providers", "locations", "treatments"):
+        assert body[field] > 0, field
+    assert body["locations"] >= body["providers"]

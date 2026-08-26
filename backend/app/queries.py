@@ -79,9 +79,17 @@ def _row(row: sqlite3.Row) -> dict:
 
 
 def data_freshness(conn: sqlite3.Connection) -> dict:
-    """When the data was last pulled, and the newest report in it."""
+    """What the database holds and when it was pulled.
+
+    The counts are shown on the page. A tool that says how much it covers is easier
+    to trust than one that just asserts it is complete.
+    """
     row = conn.execute(
         "SELECT MAX(fetched_at) AS fetched_at, MAX(supplied_at) AS supplied_at,"
-        " COUNT(*) AS rows FROM wachttijd"
+        " COUNT(*) AS rows,"
+        " COUNT(DISTINCT kvk_number) AS providers,"
+        " COUNT(DISTINCT location_key) AS locations,"
+        " COUNT(DISTINCT treatment_key) AS treatments"
+        " FROM wachttijd"
     ).fetchone()
     return dict(row)

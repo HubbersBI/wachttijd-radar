@@ -43,7 +43,7 @@ export function WaitRow({
   const labelLeft = unknown ? "9%" : scalePosition(row.days!, longest);
   // Long bars would push their label off the right edge, so it sits inside instead.
   const insideBar = !unknown && row.days! / longest > 0.72;
-  const insideGround = row.norm_verdict === "exceeded" ? "bg-over" : "bg-measure";
+  const insideGround = row.norm_verdict === "exceeded" ? "bg-over" : "bg-within";
   // Only where the bar reaches the norm. See NormRule.
   const showRule = row.norm_verdict === "exceeded" || row.norm_verdict === "depends";
   // Offered wherever the wait passes the stricter norm. Whether it is over the 6-week
@@ -98,7 +98,9 @@ export function WaitRow({
                       ? "text-[11px] text-paper/80"
                       : row.norm_verdict === "exceeded"
                         ? "text-[11px] text-over"
-                        : "text-[11px] text-ink-dim"
+                        : row.norm_verdict === "within"
+                          ? "text-[11px] text-within"
+                          : "text-[11px] text-ink-dim"
                   }
                 >
                   {verdict}

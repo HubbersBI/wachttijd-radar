@@ -6,12 +6,14 @@ import { scalePosition } from "@/lib/format";
  * The bar changes where the norm falls, so being over it is visible as excess rather
  * than as a marker laid on top of a bar. Three segments, in the order a wait grows:
  *
- *   blue      0 to the strict norm        the part that is within under any reading
+ *   green     0 to the strict norm        the part that is within under any reading
  *   striped   strict norm to lenient norm the part the source cannot place
  *   red       past the lenient norm       the part that is over under any reading
  *
  * A polikliniekbezoek has one norm rather than a range, so its striped segment has
  * zero width and the bar simply turns red at 4 weeks.
+ *
+ * Without a norm there is no verdict to carry, so the bar is plain indigo instead.
  */
 export function WaitBar({
   days,
@@ -39,7 +41,7 @@ export function WaitBar({
   return (
     <>
       <div
-        className="absolute inset-y-0 left-0 bg-measure"
+        className="absolute inset-y-0 left-0 bg-within"
         style={{ width: scalePosition(Math.max(within, scaleMax * 0.004), scaleMax) }}
       />
       {uncertain > 0 && (

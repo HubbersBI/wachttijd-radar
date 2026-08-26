@@ -71,17 +71,36 @@ export default function Page() {
         )}
       </header>
 
-      <section className="pt-14 pb-10">
-        <h1 className="max-w-2xl text-[clamp(2.5rem,7vw,4.25rem)] leading-[0.95] font-bold tracking-[-0.035em]">
-          Dezelfde behandeling.
-          <br />
-          Andere wachttijd.
+      <section className="pt-10 pb-6">
+        <h1 className="max-w-3xl text-[clamp(1.6rem,3.2vw,2.3rem)] leading-[1.12] font-semibold tracking-[-0.02em]">
+          Wachttijden in de ziekenhuiszorg, per behandeling en per locatie
         </h1>
-        <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-ink-dim">
+        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-dim">
           Ziekenhuizen en klinieken melden hun wachttijden aan de Nederlandse
-          Zorgautoriteit. Kies een behandeling en zie wat er werkelijk gemeld is, per
-          locatie, met de datum erbij.
+          Zorgautoriteit. Hier staat wat zij hebben gemeld, met de datum erbij, en of
+          dat binnen de treeknorm valt &mdash; de termijn waarbinnen uw zorgverzekeraar
+          u moet kunnen helpen.
         </p>
+
+        {health && (
+          <dl className="mt-7 flex flex-wrap gap-x-10 gap-y-3 border-y border-rule py-3">
+            {[
+              ["wachttijden", health.rows],
+              ["zorgaanbieders", health.providers],
+              ["locaties", health.locations],
+              ["behandelingen", health.treatments],
+            ].map(([label, value]) => (
+              <div key={label as string}>
+                <dt className="text-[11px] tracking-[0.14em] text-ink-dim uppercase">
+                  {label}
+                </dt>
+                <dd className="tabular text-[19px] leading-tight font-semibold">
+                  {(value as number).toLocaleString("nl-NL")}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </section>
 
       <DirectRequest treatments={treatments} />

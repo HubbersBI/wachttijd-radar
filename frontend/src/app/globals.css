@@ -5,18 +5,27 @@
  * Cool grey-green print stock, never cream. Nothing rounded, nothing shadowed.
  */
 @theme {
-  --color-paper: #e9ebe5;
-  --color-paper-hi: #f2f3ef;
+  --color-paper: #ecefe8;
+  --color-paper-hi: #f5f6f2;
   --color-ink: #12161b;
   --color-ink-dim: #5a6169;
   --color-ink-faint: #878d84;
   --color-rule: #c7cac1;
   --color-rule-hi: #b0b4a9;
+  /* The bars are read as a verdict, so the colours carry it: green inside the norm,
+     brick red past it. Indigo stays for anything measured without a norm to judge it
+     against, and for interactive accents.
+
+     Colour is never the only signal - every row also states its verdict in words, and
+     the bar changes at the norm rule - which is what keeps this legible to someone who
+     cannot separate red from green. */
+  --color-within: #3f6b48;
   --color-measure: #3a4d8f;
   /* The one second colour in the palette, and it earns its place: it marks the part
      of a wait that is over the treeknorm. Both are muted rather than primary - these
      bars fill the page, and a wall of saturated blue and red is tiring to read. */
   --color-over: #a8452f;
+  --color-accent: #2f4278;
 
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;

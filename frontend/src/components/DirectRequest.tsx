@@ -53,7 +53,7 @@ export function DirectRequest({ treatments }: { treatments: Treatment[] }) {
 
   if (!open) {
     return (
-      <section className="mt-10 flex flex-col gap-3 border border-ink px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="mt-8 flex flex-col gap-3 border border-ink px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-xl text-[14px] leading-relaxed">
           <strong className="font-semibold">Heeft u al een afspraak</strong> en duurt
           het te lang? U kunt uw zorgverzekeraar direct om zorgbemiddeling vragen.
@@ -70,7 +70,7 @@ export function DirectRequest({ treatments }: { treatments: Treatment[] }) {
   }
 
   return (
-    <section className="mt-10 border border-ink bg-paper-hi p-5">
+    <section className="mt-8 border border-ink bg-paper-hi p-5">
       <div className="flex items-baseline justify-between gap-4">
         <h2 className="text-[15px] font-semibold">Zorgbemiddeling aanvragen</h2>
         <button

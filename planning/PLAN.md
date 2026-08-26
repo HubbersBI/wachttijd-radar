@@ -121,6 +121,12 @@ same reason. Never collapse the band to a single norm.
 A row with no number gets no verdict. Judging a wait we do not have would be worse
 than showing none.
 
+The bars carry the verdict in colour: green inside the norm, striped through the band
+the source cannot place, brick red past it. Indigo is left for a wait with no norm to
+judge it against, and for interactive accents. Colour is never the only signal - every
+row also states its verdict in words and the bar changes at the norm rule - which is
+what keeps this readable for someone who cannot separate red from green.
+
 **The bar changes where the norm falls**, rather than a marker being laid on top of
 it: blue up to the strict norm, striped through the band the source cannot place, red
 past the lenient norm. A marker drawn over a solid bar disappears exactly when it

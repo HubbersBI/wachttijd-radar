@@ -50,6 +50,9 @@ export type WachttijdenResponse = {
 export type Health = {
   status: string;
   rows: number;
+  providers: number;
+  locations: number;
+  treatments: number;
   fetched_at: string | null;
   latest_report: string | null;
   source: string;
