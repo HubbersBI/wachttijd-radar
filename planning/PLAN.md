@@ -120,6 +120,12 @@ same reason. Never collapse the band to a single norm.
 A row with no number gets no verdict. Judging a wait we do not have would be worse
 than showing none.
 
+**The bar changes where the norm falls**, rather than a marker being laid on top of
+it: blue up to the strict norm, striped through the band the source cannot place, red
+past the lenient norm. A marker drawn over a solid bar disappears exactly when it
+matters most - on the long waits. The verdict is also written in words on every row,
+so it does not rest on colour alone.
+
 **The norm binds the insurer, not the provider.** TH/BR-025 is the toezichtkader for
 the zorgplicht. Exceeding the norm is what entitles someone to free zorgbemiddeling -
 it is not a rule the hospital broke, and the interface must not say it is.

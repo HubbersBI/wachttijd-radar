@@ -13,6 +13,9 @@
   --color-rule: #c7cac1;
   --color-rule-hi: #b0b4a9;
   --color-measure: #1b2ed8;
+  /* The one second colour in the palette, and it earns its place: it marks the part
+     of a wait that is over the treeknorm. De Stijl red beside the ultramarine. */
+  --color-over: #c0261a;
 
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
@@ -34,6 +37,17 @@ body {
 .tabular {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* The stretch of a wait between the 6-week and 7-week norms, where the source does
+   not say which applies. Striped rather than solid: it is neither within nor over. */
+.hatch-uncertain {
+  background-color: color-mix(in srgb, var(--color-over) 14%, transparent);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-over) 0 2px,
+    transparent 2px 7px
+  );
 }
 
 /* A wait with no trustworthy number. Hatched rather than empty, so the row still

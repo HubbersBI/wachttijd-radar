@@ -58,3 +58,35 @@ describe("WaitRow", () => {
     expect(screen.queryByText(/Utrecht ·/)).not.toBeInTheDocument();
   });
 });
+
+describe("WaitRow against the treeknorm", () => {
+  it("names the verdict in words, not only in colour", () => {
+    render(<WaitRow row={base} longest={256} norm={[42, 49]} />);
+    expect(screen.getByText("boven de treeknorm")).toBeInTheDocument();
+  });
+
+  it("says a wait is within the norm when it is", () => {
+    const inside = { ...base, days: 30, norm_verdict: "within" as const };
+    render(<WaitRow row={inside} longest={256} norm={[42, 49]} />);
+    expect(screen.getByText("binnen de treeknorm")).toBeInTheDocument();
+  });
+
+  it("calls the 6-to-7-week band a boundary rather than a breach", () => {
+    const edge = { ...base, days: 45, norm_verdict: "depends" as const };
+    render(<WaitRow row={edge} longest={256} norm={[42, 49]} />);
+    expect(screen.getByText("op de grens")).toBeInTheDocument();
+    expect(screen.queryByText("boven de treeknorm")).not.toBeInTheDocument();
+  });
+
+  it("gives no verdict at all to a row with no number", () => {
+    const unknown = {
+      ...base,
+      days: null,
+      insufficient_observations: true,
+      norm_verdict: null,
+    };
+    render(<WaitRow row={unknown} longest={256} norm={[42, 49]} />);
+    expect(screen.getByText("onvoldoende waarnemingen")).toBeInTheDocument();
+    expect(screen.queryByText(/treeknorm/)).not.toBeInTheDocument();
+  });
+});
