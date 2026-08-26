@@ -67,8 +67,10 @@ export function WaitBar({
 /**
  * The treeknorm itself, as a rule through the track.
  *
- * Needed even though the bar changes colour there: a wait well inside the norm has no
- * colour change to show, and without the rule there would be nothing to be inside of.
+ * Drawn only where the bar actually reaches the norm. On a wait comfortably inside it
+ * the rule floats in empty track with nothing touching it and reads as a stray mark,
+ * and "binnen de treeknorm" on the row already says what it needs to.
+ *
  * Taller than the track so it stays visible where a label sits over it.
  */
 export function NormRule({ norm, scaleMax }: { norm: [number, number]; scaleMax: number }) {

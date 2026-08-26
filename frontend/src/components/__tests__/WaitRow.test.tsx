@@ -90,3 +90,37 @@ describe("WaitRow against the treeknorm", () => {
     expect(screen.queryByText(/treeknorm/)).not.toBeInTheDocument();
   });
 });
+
+describe("WaitRow norm rule", () => {
+  const rule = (container: HTMLElement) =>
+    container.querySelector('[class*="-inset-y-1.5"]');
+
+  it("draws no rule on a wait inside the norm - the words carry it", () => {
+    const inside = { ...base, days: 30, norm_verdict: "within" as const };
+    const { container } = render(<WaitRow row={inside} longest={256} norm={[42, 49]} />);
+    expect(rule(container)).toBeNull();
+    expect(screen.getByText("binnen de treeknorm")).toBeInTheDocument();
+  });
+
+  it("draws the rule where the wait is over the norm", () => {
+    const { container } = render(<WaitRow row={base} longest={256} norm={[42, 49]} />);
+    expect(rule(container)).not.toBeNull();
+  });
+
+  it("draws the rule where the wait reaches the boundary band", () => {
+    const edge = { ...base, days: 45, norm_verdict: "depends" as const };
+    const { container } = render(<WaitRow row={edge} longest={256} norm={[42, 49]} />);
+    expect(rule(container)).not.toBeNull();
+  });
+
+  it("draws no rule beside a row with no number", () => {
+    const unknown = {
+      ...base,
+      days: null,
+      insufficient_observations: true,
+      norm_verdict: null,
+    };
+    const { container } = render(<WaitRow row={unknown} longest={256} norm={[42, 49]} />);
+    expect(rule(container)).toBeNull();
+  });
+});

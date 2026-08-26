@@ -38,6 +38,8 @@ export function WaitRow({
   // Long bars would push their label off the right edge, so it sits inside instead.
   const insideBar = !unknown && row.days! / longest > 0.72;
   const insideGround = row.norm_verdict === "exceeded" ? "bg-over" : "bg-measure";
+  // Only where the bar reaches the norm. See NormRule.
+  const showRule = row.norm_verdict === "exceeded" || row.norm_verdict === "depends";
 
   return (
     <li className="border-t border-rule py-2.5">
@@ -49,7 +51,7 @@ export function WaitRow({
       </div>
 
       <div className="relative mt-2 h-4">
-        {norm && <NormRule norm={norm} scaleMax={longest} />}
+        {norm && showRule && <NormRule norm={norm} scaleMax={longest} />}
 
         {unknown ? (
           <div className="hatch absolute inset-y-0 left-0 w-[9%] border border-rule-hi" />
