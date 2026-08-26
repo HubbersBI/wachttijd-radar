@@ -1,4 +1,4 @@
-# Wachttijd-radar
+# Wachttijd radar
 
 Dutch hospital waiting times, compared per treatment and per location, measured against
 the legal norm — and turned into the request your insurer is obliged to act on.
