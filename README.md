@@ -36,7 +36,7 @@ from the real figures and addressed to the right insurer.
 
 ![The drafted zorgbemiddeling request, citing the provider, the wait, the date and the norm](docs/screenshots/02-zorgbemiddeling.png)
 
-**Answers.** A question in plain Dutch — *"MRI heup in Amsterdam binnen 4 weken"* —
+**AI assistan.** A question in plain Dutch — *"MRI heup in Amsterdam binnen 4 weken"* —
 resolves to a treatment, a city and a deadline, and returns rows from the database.
 
 ![The assistant panel answering a question in plain Dutch](docs/screenshots/03-zoekhulp.png)
