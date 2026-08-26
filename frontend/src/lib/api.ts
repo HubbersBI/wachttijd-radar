@@ -40,7 +40,12 @@ export type WachttijdenResponse = {
   treatment: string;
   treatment_type: string;
   city: string | null;
+  max_days: number | null;
   count: number;
+  /** How many locations were looked at before the deadline was applied. */
+  considered: number;
+  /** How many of those reported no figure, so could not be said to meet it. */
+  unreported: number;
   source: string;
   norm_days: [number, number] | null;
   norm_source: string;
@@ -73,4 +78,29 @@ export function getWachttijden(treatmentKey: string, city?: string) {
   const params = new URLSearchParams({ treatment_key: treatmentKey });
   if (city) params.set("city", city);
   return get<WachttijdenResponse>(`/api/wachttijden?${params}`);
+}
+
+export type Understood = {
+  treatment_key: string | null;
+  city: string | null;
+  max_days: number | null;
+  within_norm: boolean;
+  /** "groq" when a model read the question, "rules" when the fallback did. */
+  read_by: string;
+};
+
+export type AssistantReply = {
+  understood: Understood;
+  error?: string;
+  answer?: WachttijdenResponse;
+};
+
+export async function ask(question: string): Promise<AssistantReply> {
+  const response = await fetch("/api/assistant", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+  if (!response.ok) throw new Error(`/api/assistant gaf ${response.status}`);
+  return response.json();
 }

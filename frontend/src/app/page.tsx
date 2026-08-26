@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { Assistant } from "@/components/Assistant";
 import { Controls } from "@/components/Controls";
 import { DirectRequest } from "@/components/DirectRequest";
 import { Scale } from "@/components/Scale";
@@ -102,6 +103,8 @@ export default function Page() {
           </dl>
         )}
       </section>
+
+      <Assistant treatments={treatments} />
 
       <DirectRequest treatments={treatments} />
 
