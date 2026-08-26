@@ -3,7 +3,7 @@
 Dutch hospital waiting times, compared per treatment and per location, measured against
 the legal norm — and turned into the request your insurer is obliged to act on.
 
-![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/01-vergelijking.png)
+![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/Screenshot 2026-08-26 170624.png)
 
 Four hospitals, one city, one treatment, on a single day in August 2026: **30, 68 and
 256 days** — and one location that reported too few observations to give a figure at
