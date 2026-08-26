@@ -48,7 +48,7 @@ export function WaitRow({
         </span>
       </div>
 
-      <div className="relative mt-2 h-[20px]">
+      <div className="relative mt-2 h-4">
         {norm && <NormRule norm={norm} scaleMax={longest} />}
 
         {unknown ? (

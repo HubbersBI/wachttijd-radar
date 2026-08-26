@@ -12,10 +12,11 @@
   --color-ink-faint: #878d84;
   --color-rule: #c7cac1;
   --color-rule-hi: #b0b4a9;
-  --color-measure: #1b2ed8;
+  --color-measure: #3a4d8f;
   /* The one second colour in the palette, and it earns its place: it marks the part
-     of a wait that is over the treeknorm. De Stijl red beside the ultramarine. */
-  --color-over: #c0261a;
+     of a wait that is over the treeknorm. Both are muted rather than primary - these
+     bars fill the page, and a wall of saturated blue and red is tiring to read. */
+  --color-over: #a8452f;
 
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
