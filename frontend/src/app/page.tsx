@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { Assistant } from "@/components/Assistant";
+import { AssistantDrawer } from "@/components/AssistantDrawer";
 import { Controls } from "@/components/Controls";
 import { DirectRequest } from "@/components/DirectRequest";
 import { Scale } from "@/components/Scale";
@@ -83,28 +83,7 @@ export default function Page() {
           u moet kunnen helpen.
         </p>
 
-        {health && (
-          <dl className="mt-7 flex flex-wrap gap-x-10 gap-y-3 border-y border-rule py-3">
-            {[
-              ["wachttijden", health.rows],
-              ["zorgaanbieders", health.providers],
-              ["locaties", health.locations],
-              ["behandelingen", health.treatments],
-            ].map(([label, value]) => (
-              <div key={label as string}>
-                <dt className="text-[11px] tracking-[0.14em] text-ink-dim uppercase">
-                  {label}
-                </dt>
-                <dd className="tabular text-[19px] leading-tight font-semibold">
-                  {(value as number).toLocaleString("nl-NL")}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
       </section>
-
-      <Assistant treatments={treatments} />
 
       <DirectRequest treatments={treatments} />
 
@@ -193,6 +172,7 @@ export default function Page() {
           Geen locaties gevonden voor deze behandeling in {city}.
         </p>
       )}
+      <AssistantDrawer treatments={treatments} />
     </div>
   );
 }

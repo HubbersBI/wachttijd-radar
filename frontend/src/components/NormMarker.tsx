@@ -29,12 +29,23 @@ export function NormBand({ norm, scaleMax }: { norm: [number, number]; scaleMax:
   );
 }
 
-/** The label above the axis, naming what the band is. */
+/**
+ * The label above the axis, naming what the band is.
+ *
+ * It sits to the right of the mark, except when the mark is near the end of the
+ * scale - which happens whenever everything in view is inside the norm - where it
+ * would run off the edge and take a scrollbar with it. Then it sits to the left.
+ */
 export function NormLabel({ norm, scaleMax }: { norm: [number, number]; scaleMax: number }) {
+  const left = scalePosition(norm[0], scaleMax);
+  const nearTheEnd = norm[0] / scaleMax > 0.7;
+
   return (
     <span
-      className="tabular absolute bottom-0 pl-1.5 text-[10px] whitespace-nowrap text-ink-dim"
-      style={{ left: scalePosition(norm[0], scaleMax) }}
+      className={`tabular absolute bottom-0 text-[10px] whitespace-nowrap text-ink-dim ${
+        nearTheEnd ? "pr-1.5" : "pl-1.5"
+      }`}
+      style={nearTheEnd ? { right: `calc(100% - ${left})` } : { left }}
     >
       treeknorm {normLabel(norm)}
     </span>

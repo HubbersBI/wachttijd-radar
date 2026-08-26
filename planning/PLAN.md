@@ -35,6 +35,11 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
    model resolves the treatment, the city and the deadline, and nothing else. Without
    a key the same parse runs on rules, so it demos and tests with no network.
 
+   It lives in a panel that slides in from the right rather than a block in the page.
+   Asking is one of two ways in and the list is the other; neither should have to
+   scroll past the other. The page stays usable behind it, so it is not a modal and
+   does not trap focus. Escape closes it.
+
    **The login is a demonstration of the pattern, not a requirement.** Nothing in
    this app is per-person: you pick a treatment and read a comparison, and the
    zorgbemiddeling draft is a form filled fresh each time and never persisted.

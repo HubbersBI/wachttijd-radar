@@ -17,6 +17,8 @@ const EXAMPLES = [
 /**
  * A question in plain Dutch, answered with rows from the database.
  *
+ * Rendered inside AssistantDrawer, which supplies the panel and its padding.
+ *
  * What the assistant understood is printed back before the answer. With 113
  * bureaucratic treatment names it will sometimes pick the wrong one, and someone who
  * can see that it searched for "MRI heup" rather than "heupvervanging" can correct it.
@@ -57,7 +59,7 @@ export function Assistant({ treatments }: { treatments: Treatment[] }) {
   );
 
   return (
-    <section className="mt-8 border border-ink px-5 py-4">
+    <section className="pt-4">
       <form onSubmit={submit}>
         <label htmlFor="vraag" className="block text-[14px] leading-relaxed">
           <strong className="font-semibold">Vraag het in uw eigen woorden.</strong>{" "}
