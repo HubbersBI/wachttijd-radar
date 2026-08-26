@@ -12,7 +12,10 @@ import httpx
 from .base import Wachttijd, now_iso
 
 API_URL = "https://zorgbeeld.nza.nl/openapi/WaitingTimeMSZ"
-USER_AGENT = "wachttijd-radar/0.1 (portfolio project; +https://github.com/jhhub/wachttijd-radar)"
+USER_AGENT = (
+    "wachttijd-radar/0.1 (portfolio project; "
+    "+https://github.com/HubbersBI/wachttijd-radar)"
+)
 CACHE_PATH = Path(__file__).resolve().parents[3] / "db" / "cache" / "nza_msz.json"
 
 

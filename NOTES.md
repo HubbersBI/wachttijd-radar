@@ -60,7 +60,7 @@ shown honestly.
 
 ## Reusable from Artifinancial when the time comes
 
-`C:\Users\jhhub\Projects\finally` has a working multi-stage Dockerfile,
+The local Artifinancial project has a working multi-stage Dockerfile,
 docker-compose, and idempotent start/stop scripts for Mac and Windows. Copy
 them once the stack is chosen - they assume FastAPI serving a static frontend
 export on one port.

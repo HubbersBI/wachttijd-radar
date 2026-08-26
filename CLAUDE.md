@@ -84,7 +84,7 @@ cached snapshot.
 
 ## Stack
 
-Copied from `C:\Users\jhhub\Projects\finally`, which has the working Dockerfile,
+Copied from the Artifinancial project, which has the working Dockerfile,
 docker-compose and idempotent start/stop scripts.
 
 - `backend/` — FastAPI + uv, Python 3.12. Serves `/api` and the static frontend
