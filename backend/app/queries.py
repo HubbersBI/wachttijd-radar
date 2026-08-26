@@ -18,13 +18,6 @@ FROM wachttijd
 WHERE treatment_key = ?
 """
 
-HISTORY = """
-SELECT location_key, days, insufficient_observations, supplied_at
-FROM wachttijd
-WHERE treatment_key = ?
-ORDER BY location_key, supplied_at
-"""
-
 TREATMENTS = """
 WITH named AS (
   SELECT treatment_key, treatment, specialism, treatment_type,
@@ -64,31 +57,7 @@ def wachttijden(conn: sqlite3.Connection, treatment_key: str, city: str | None =
         sql += " AND city = ? COLLATE NOCASE"
         params.append(city)
     sql += " ORDER BY days IS NULL, days"
-    rows = [_row(row) for row in conn.execute(sql, params)]
-
-    past = history(conn, treatment_key)
-    for row in rows:
-        row["history"] = past.get(row["location_key"], [])
-    return rows
-
-
-def history(conn: sqlite3.Connection, treatment_key: str) -> dict[str, list[dict]]:
-    """Every report per location for one treatment, oldest first.
-
-    The table already holds one row per report; this is what those rows were for. A
-    location with a single report has a one-point history and no trend - the UI must
-    not imply movement where none has been observed.
-    """
-    grouped: dict[str, list[dict]] = {}
-    for row in conn.execute(HISTORY, (treatment_key,)):
-        grouped.setdefault(row["location_key"], []).append(
-            {
-                "days": row["days"],
-                "insufficient_observations": bool(row["insufficient_observations"]),
-                "supplied_at": row["supplied_at"],
-            }
-        )
-    return grouped
+    return [_row(row) for row in conn.execute(sql, params)]
 
 
 def _row(row: sqlite3.Row) -> dict:

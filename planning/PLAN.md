@@ -83,7 +83,7 @@ Step 1 needs three endpoints.
 ```
 GET /api/health                              -> row count, fetched_at, newest report
 GET /api/treatments                          -> treatments + specialisms, for the picker
-GET /api/wachttijden?treatment_key=&city=    -> ranked rows, each with dates and history
+GET /api/wachttijden?treatment_key=&city=    -> ranked rows, each carrying its own dates
 ```
 
 Every row returned by `/api/wachttijden` carries `days`, `treatment_type`,
@@ -98,17 +98,6 @@ prevent.
 
 Reads always resolve to the latest report per location and treatment. The table is a
 history; without that, a provider would appear once per report it has ever filed.
-
-Each row also carries `history`: every report for that location and treatment, oldest
-first. Two measured reports are the minimum for a trend - one report is a point, and
-a line through a point invents movement that was never observed. A row whose current
-report has no number shows no trend either: the earlier figures are real, but a
-change shown beside "onvoldoende waarnemingen" reads as movement we cannot claim.
-
-`WACHTTIJD_REFRESH_HOURS` (default 24) drives a slow background fetch so the history
-fills without anyone remembering to run one. Most passes insert nothing, because
-storing is a no-op until a provider files a new figure. The rows that do land are
-the trend.
 
 ## The screen
 
@@ -170,5 +159,5 @@ These could change. The ones above cannot.
 - Ggz. Blocked on the 2026 transition and the Vektis terms, as above.
 - Commercial use of Vektis data — blocked by their licence for as long as ggz data
   is in the app at all.
-- A dedicated history screen. Each row carries its own run inline and draws a
-  sparkline; a full per-location history view is not in v1.
+- Snapshot history as a visible feature. The schema records it from day one; no
+  screen shows it in v1.

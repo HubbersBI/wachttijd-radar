@@ -11,9 +11,7 @@ export function Scale({ longest }: { longest: number }) {
   const ticks = axisTicks(longest);
 
   return (
-    // Same grid as every row, so a tick and a bar at the same value line up.
-    <div className="row-grid select-none pt-1" aria-hidden="true">
-      <div>
+    <div className="relative select-none pt-1" aria-hidden="true">
       <div className="relative h-3">
         {ticks.map((tick) => (
           <span
@@ -38,8 +36,6 @@ export function Scale({ longest }: { longest: number }) {
           </span>
         ))}
       </div>
-      </div>
-      <div />
     </div>
   );
 }

@@ -34,26 +34,3 @@ export function axisTicks(longest: number, count = 5): number[] {
   for (let value = 0; value <= longest; value += step) ticks.push(value);
   return ticks;
 }
-
-/** Points that carry a number, oldest first. Reports without one cannot be plotted. */
-export function measuredHistory(history: { days: number | null }[]): number[] {
-  return history.filter((point) => point.days !== null).map((point) => point.days!);
-}
-
-/**
- * Change between the first and last measured report.
- *
- * Null when there is nothing to compare: a single report is a point, not a trend,
- * and must never be drawn as movement.
- */
-export function trend(history: { days: number | null }[]): number | null {
-  const measured = measuredHistory(history);
-  if (measured.length < 2) return null;
-  return measured[measured.length - 1] - measured[0];
-}
-
-/** "+166 dagen" / "-12 dagen", with the sign always shown. */
-export function formatTrend(change: number): string {
-  const sign = change > 0 ? "+" : "\u2212";
-  return `${sign}${Math.abs(change)} ${Math.abs(change) === 1 ? "dag" : "dagen"}`;
-}

@@ -8,13 +8,6 @@ export type Treatment = {
   location_count: number;
 };
 
-export type HistoryPoint = {
-  /** Days. Null when that report had insufficient observations. */
-  days: number | null;
-  insufficient_observations: boolean;
-  supplied_at: string;
-};
-
 export type Wachttijd = {
   location_key: string;
   care_provider: string;
@@ -32,8 +25,6 @@ export type Wachttijd = {
   supplied_at: string;
   /** When we pulled it. */
   fetched_at: string;
-  /** Every report for this location and treatment, oldest first. */
-  history: HistoryPoint[];
 };
 
 export type WachttijdenResponse = {
