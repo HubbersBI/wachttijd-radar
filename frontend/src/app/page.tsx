@@ -55,6 +55,11 @@ export default function Page() {
   const norm = data?.norm_days ?? null;
   const scaleMax = Math.max(longest, norm ? norm[1] : 0);
   const over = rows.filter((row) => row.norm_verdict === "exceeded").length;
+  // The shortest measured wait in view, cited in a draft as somewhere to be sent
+  // instead. Null when nothing in view has a figure at all.
+  const alternative = measured.length
+    ? measured.reduce((best, row) => (row.days! < best.days! ? row : best))
+    : null;
   const ambiguous = rows.filter((row) => row.norm_verdict === "depends").length;
 
   return (
@@ -143,6 +148,7 @@ export default function Page() {
                   row={row}
                   longest={scaleMax}
                   norm={norm}
+                  alternative={alternative}
                   showCity={!city}
                 />
               ))}

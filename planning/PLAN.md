@@ -25,7 +25,8 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
 2. **Treeknorm check.** Done. The norm is marked on the same scale as the bars and
    the list says how many locations sit past it. The mapping question was answered
    from the regulation, not by preference - see Treeknormen below.
-3. **Zorgbemiddeling draft.** Deterministic template over stored figures.
+3. **Zorgbemiddeling draft.** Done. A deterministic template over the figures on
+   the page, built entirely in the browser.
 4. **DigiD-style demo login, then the AI assistant.** Both are presentation over
    something that already works, so they come last. Both are also where the hard
    boundaries below start to bite — read them before starting this step, not
@@ -138,6 +139,28 @@ prevent.
 
 Reads always resolve to the latest report per location and treatment. The table is a
 history; without that, a provider would appear once per report it has ever filed.
+
+## The zorgbemiddeling draft
+
+Offered on any row whose wait passes the stricter norm. Whether it is over the 6-week
+or the 7-week reading is the insurer's to determine - the person is asking, not
+adjudicating - and the draft states the facts either way.
+
+**Built in the browser and never sent anywhere.** The draft names someone's treatment
+and their wait, which is health data about them, and the hard boundaries forbid
+persisting it. Generating it client-side means their name and insurer never reach the
+server: there is nothing to log, store or leak. That is a guarantee rather than a
+policy, and it is why this is a pure function in `lib/draft.ts` and not an endpoint.
+Nothing typed into it is written to localStorage either. Closing the panel is the
+retention policy.
+
+The draft cites the provider, the wait, the date it was reported, the source, and the
+norm with the excess computed against the reading that holds either way. Where a
+shorter wait exists elsewhere for the same treatment it cites that too, with its own
+report date - never itself, and never one that is no shorter.
+
+When the assistant arrives in step 4 it may adjust tone only. The name and insurer are
+inserted after any model call, never sent to one.
 
 ## The screen
 

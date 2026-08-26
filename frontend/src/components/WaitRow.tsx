@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+
+import { DraftPanel } from "@/components/DraftPanel";
 import { NormRule, WaitBar } from "@/components/WaitBar";
 import type { Wachttijd } from "@/lib/api";
 import { formatDate, formatWait, scalePosition } from "@/lib/format";
@@ -23,15 +28,19 @@ export function WaitRow({
   row,
   longest,
   norm,
+  alternative = null,
   showCity = true,
 }: {
   row: Wachttijd;
   /** The scale maximum, which is at least the norm so the rule is always visible. */
   longest: number;
   norm?: [number, number] | null;
+  /** The shortest wait for this treatment, cited in the draft as somewhere to go. */
+  alternative?: Wachttijd | null;
   /** Hidden when the list is already filtered to one city - it would repeat every row. */
   showCity?: boolean;
 }) {
+  const [drafting, setDrafting] = useState(false);
   const unknown = row.days === null;
   const verdict = row.norm_verdict ? VERDICT_TEXT[row.norm_verdict] : null;
   const labelLeft = unknown ? "9%" : scalePosition(row.days!, longest);
@@ -40,13 +49,28 @@ export function WaitRow({
   const insideGround = row.norm_verdict === "exceeded" ? "bg-over" : "bg-measure";
   // Only where the bar reaches the norm. See NormRule.
   const showRule = row.norm_verdict === "exceeded" || row.norm_verdict === "depends";
+  // Offered wherever the wait passes the stricter norm. Whether it is over the 6-week
+  // or the 7-week reading is the insurer's to determine - the person is asking, not
+  // adjudicating, and the draft states the facts either way.
+  const canRequest = showRule && norm && row.days !== null;
 
   return (
     <li className="border-t border-rule py-2.5">
       <div className="flex items-baseline justify-between gap-4">
         <h3 className="truncate text-[14px] leading-tight font-medium">{row.location}</h3>
-        <span className="tabular shrink-0 text-[11px] text-ink-faint">
-          {showCity && `${row.city} \u00b7 `}gemeld {formatDate(row.supplied_at)}
+        <span className="tabular flex shrink-0 items-baseline gap-3 text-[11px] text-ink-faint">
+          <span>
+            {showCity && `${row.city} \u00b7 `}gemeld {formatDate(row.supplied_at)}
+          </span>
+          {canRequest && (
+            <button
+              type="button"
+              onClick={() => setDrafting((open) => !open)}
+              className="shrink-0 text-ink underline underline-offset-2"
+            >
+              {drafting ? "verberg verzoek" : "zorgbemiddeling"}
+            </button>
+          )}
         </span>
       </div>
 
@@ -87,6 +111,15 @@ export function WaitRow({
           )}
         </span>
       </div>
+
+      {drafting && canRequest && (
+        <DraftPanel
+          row={row}
+          norm={norm!}
+          alternative={alternative}
+          onClose={() => setDrafting(false)}
+        />
+      )}
     </li>
   );
 }
