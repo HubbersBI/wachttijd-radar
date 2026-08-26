@@ -142,7 +142,17 @@ history; without that, a provider would appear once per report it has ever filed
 
 ## The zorgbemiddeling draft
 
-Offered on any row whose wait passes the stricter norm. Whether it is over the 6-week
+Two ways in.
+
+**Directly, from the top of the page.** Most people who need bemiddeling already have
+an appointment: they know where they are waiting and how long, and the comparison is
+beside the point. They fill in the treatment, the provider and the date they have been
+given, and the request is built from that. Their own appointment is better evidence
+for them than a national median, and it is attributed to the appointment rather than
+to the NZa so the two are never confused. A wait that turns out to be inside the norm
+gets no draft - it says so instead.
+
+**From a row in the list**, offered on any row whose wait passes the stricter norm. Whether it is over the 6-week
 or the 7-week reading is the insurer's to determine - the person is asking, not
 adjudicating - and the draft states the facts either way.
 

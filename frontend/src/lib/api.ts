@@ -6,6 +6,8 @@ export type Treatment = {
   specialism: string | null;
   treatment_type: string;
   location_count: number;
+  /** The norm this treatment is judged against, in days: [strictest, most lenient]. */
+  norm_days: [number, number] | null;
 };
 
 export type Wachttijd = {

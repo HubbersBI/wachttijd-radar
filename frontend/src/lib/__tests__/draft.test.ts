@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Wachttijd } from "@/lib/api";
-import { buildDraft, draftSubject } from "@/lib/draft";
+import { buildAppointmentDraft, buildDraft, daysUntil, draftSubject } from "@/lib/draft";
 
 const row: Wachttijd = {
   location_key: "abc",
@@ -102,5 +102,50 @@ describe("draftSubject", () => {
   it("names the treatment, which is what an insurer sorts on", () => {
     expect(draftSubject(row)).toContain("zorgbemiddeling");
     expect(draftSubject(row)).toContain("knie vervanging");
+  });
+});
+
+describe("buildAppointmentDraft", () => {
+  const today = new Date(2026, 7, 26);
+  const appointment = (over: Record<string, unknown> = {}) =>
+    buildAppointmentDraft({
+      treatment: "Initiele totale knie vervanging (orthopedie)",
+      norm: [42, 49],
+      provider: "Sint Antonius Ziekenhuis Utrecht",
+      appointmentDate: "2027-01-15",
+      name: "J. Hubbers",
+      insurer: "Anderzorg",
+      today,
+      ...over,
+    });
+
+  it("counts the wait from today to the appointment", () => {
+    expect(daysUntil("2026-09-05", today)).toBe(10);
+    expect(appointment()).toContain("142 dagen vanaf vandaag");
+  });
+
+  it("attributes the wait to the appointment, not to the NZa", () => {
+    const text = appointment();
+    expect(text).toContain("de afspraak die mij is gegeven");
+    expect(text).not.toContain("Zorgbeeldportaal");
+  });
+
+  it("states the appointment date and the provider the person named", () => {
+    const text = appointment();
+    expect(text).toContain("15 jan 2027");
+    expect(text).toContain("Sint Antonius Ziekenhuis Utrecht");
+  });
+
+  it("judges the wait against the same norm as the list", () => {
+    expect(appointment()).toContain("93 dagen boven");
+  });
+
+  it("refuses an appointment that is not in the future", () => {
+    expect(() => appointment({ appointmentDate: "2026-08-26" })).toThrow();
+    expect(() => appointment({ appointmentDate: "2026-01-01" })).toThrow();
+  });
+
+  it("asks for the same thing the other request asks for", () => {
+    expect(appointment()).toContain("zo dicht mogelijk bij mijn woonplaats");
   });
 });

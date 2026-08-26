@@ -90,3 +90,11 @@ def test_a_row_without_a_number_never_gets_a_verdict(client):
         ).json()["results"]
         for row in rows:
             assert (row["norm_verdict"] is None) == (row["days"] is None)
+
+
+def test_treatments_carry_the_norm_they_are_judged_against(client):
+    """So a request drafted from someone's own appointment uses the same norms."""
+    for treatment in client.get("/api/treatments").json()["treatments"]:
+        assert treatment["norm_days"], treatment["treatment"]
+        strict, lenient = treatment["norm_days"]
+        assert strict <= lenient

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Controls } from "@/components/Controls";
+import { DirectRequest } from "@/components/DirectRequest";
 import { Scale } from "@/components/Scale";
 import { WaitRow } from "@/components/WaitRow";
 import type { Health, Treatment, WachttijdenResponse } from "@/lib/api";
@@ -83,7 +84,12 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="border-t border-ink pt-6">
+      <DirectRequest treatments={treatments} />
+
+      <section className="mt-10 border-t border-ink pt-6">
+        <p className="mb-4 text-[13px] text-ink-dim">
+          Of zoek eerst op waar de wachttijd voor uw behandeling het kortst is.
+        </p>
         <Controls
           treatments={treatments}
           treatmentKey={treatmentKey}

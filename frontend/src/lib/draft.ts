@@ -61,28 +61,32 @@ export function draftSubject(row: Wachttijd): string {
   return `Verzoek om zorgbemiddeling - ${row.treatment}`;
 }
 
-export function buildDraft({ row, norm, name, insurer }: DraftInput): string {
-  const days = row.days;
-  if (days === null) throw new Error("Geen wachttijd om te melden");
-
-  const lines = [
+/** The parts every request shares, whatever the wait was measured from. */
+function compose({
+  insurer,
+  opening,
+  facts,
+  norm,
+  days,
+  name,
+}: {
+  insurer: string;
+  opening: string;
+  facts: string[];
+  norm: [number, number];
+  days: number;
+  name: string;
+}): string {
+  return [
     "Betreft: verzoek om zorgbemiddeling",
     "",
     "Geachte heer/mevrouw,",
     "",
-    `Ik ben verzekerd bij ${insurer.trim() || PLACEHOLDER_INSURER} en wacht op de ` +
-      "onderstaande behandeling. Ik verzoek u om zorgbemiddeling.",
+    `Ik ben verzekerd bij ${insurer.trim() || PLACEHOLDER_INSURER}. ${opening}`,
     "",
-    `Behandeling:        ${row.treatment}`,
-    `Zorgaanbieder:      ${placeOf(row)}`,
-    `Gemelde wachttijd:  ${days} dagen`,
-    `Gemeld op:          ${formatDate(row.supplied_at)}`,
-    "Bron:               Nederlandse Zorgautoriteit, Zorgbeeldportaal",
+    ...facts,
     "",
     normSentence(norm, days),
-  ];
-
-  lines.push(
     "",
     // Deliberately does not name an alternative. Which provider is suitable, and how
     // far someone can reasonably travel, is the insurer's obligation to work out -
@@ -93,7 +97,84 @@ export function buildDraft({ row, norm, name, insurer }: DraftInput): string {
     "",
     "Met vriendelijke groet,",
     name.trim() || PLACEHOLDER_NAME,
-  );
+  ].join("\n");
+}
 
-  return lines.join("\n");
+/** A request built from a waiting time the provider reported to the NZa. */
+export function buildDraft({ row, norm, name, insurer }: DraftInput): string {
+  const days = row.days;
+  if (days === null) throw new Error("Geen wachttijd om te melden");
+
+  return compose({
+    insurer,
+    opening:
+      "Ik wacht op de onderstaande behandeling en verzoek u om zorgbemiddeling.",
+    facts: [
+      `Behandeling:        ${row.treatment}`,
+      `Zorgaanbieder:      ${placeOf(row)}`,
+      `Gemelde wachttijd:  ${days} dagen`,
+      `Gemeld op:          ${formatDate(row.supplied_at)}`,
+      "Bron:               Nederlandse Zorgautoriteit, Zorgbeeldportaal",
+    ],
+    norm,
+    days,
+    name,
+  });
+}
+
+export type AppointmentInput = {
+  treatment: string;
+  norm: [number, number];
+  provider: string;
+  /** ISO date of the appointment the person has been given. */
+  appointmentDate: string;
+  name: string;
+  insurer: string;
+  /** Injected in tests; defaults to today. */
+  today?: Date;
+};
+
+/** Whole days from today until the appointment. Negative once it is in the past. */
+export function daysUntil(appointmentDate: string, today: Date = new Date()): number {
+  const start = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const [year, month, day] = appointmentDate.split("-").map(Number);
+  return Math.round((Date.UTC(year, month - 1, day) - start) / 86400000);
+}
+
+/**
+ * A request built from the appointment someone has actually been given.
+ *
+ * Most people who need bemiddeling already have a date; their own wait is better
+ * evidence for them than a national median, and it is attributed to them rather than
+ * to the NZa so the two are never confused.
+ */
+export function buildAppointmentDraft({
+  treatment,
+  norm,
+  provider,
+  appointmentDate,
+  name,
+  insurer,
+  today,
+}: AppointmentInput): string {
+  const days = daysUntil(appointmentDate, today);
+  if (days <= 0) throw new Error("De afspraak ligt niet in de toekomst");
+
+  return compose({
+    insurer,
+    opening:
+      "Ik heb voor de onderstaande behandeling een afspraak gekregen, maar de " +
+      "wachttijd daarnaartoe is langer dan de treeknorm. Ik verzoek u om " +
+      "zorgbemiddeling.",
+    facts: [
+      `Behandeling:        ${treatment}`,
+      `Zorgaanbieder:      ${provider.trim() || "[naam zorgaanbieder]"}`,
+      `Datum afspraak:     ${formatDate(appointmentDate)}`,
+      `Wachttijd:          ${days} dagen vanaf vandaag`,
+      "Bron:               de afspraak die mij is gegeven",
+    ],
+    norm,
+    days,
+    name,
+  });
 }

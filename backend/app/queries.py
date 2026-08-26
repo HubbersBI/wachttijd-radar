@@ -44,7 +44,14 @@ def treatments(conn: sqlite3.Connection) -> list[dict]:
     identity; grouping by name would split one treatment across two lists and hide
     providers from the comparison.
     """
-    return [dict(row) for row in conn.execute(TREATMENTS)]
+    out = []
+    for row in conn.execute(TREATMENTS):
+        entry = dict(row)
+        # Carried here so anyone drafting a request against their own appointment can
+        # judge it without a second round trip, and against the same norms as the list.
+        entry["norm_days"] = treeknorm.norm_for(entry["treatment_type"])
+        out.append(entry)
+    return out
 
 
 def wachttijden(conn: sqlite3.Connection, treatment_key: str, city: str | None = None) -> list[dict]:
