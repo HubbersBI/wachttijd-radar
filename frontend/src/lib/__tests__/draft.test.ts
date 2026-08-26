@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Wachttijd } from "@/lib/api";
-import { buildDraft } from "@/lib/draft";
+import { buildDraft, draftSubject } from "@/lib/draft";
 
 const row: Wachttijd = {
   location_key: "abc",
@@ -70,7 +70,7 @@ describe("buildDraft", () => {
   it("leaves visible placeholders rather than inventing a name or insurer", () => {
     const text = draft();
     expect(text).toContain("[uw naam]");
-    expect(text).toContain("[naam zorgverzekeraar]");
+    expect(text).toContain("[uw zorgverzekeraar]");
   });
 
   it("uses what the person typed when they typed it", () => {
@@ -114,5 +114,12 @@ describe("buildDraft naming the place", () => {
     const elsewhere = { ...row, location: "Diakonessenhuis", city: "Zeist" };
     const text = draft({ row: elsewhere });
     expect(text).toContain("Diakonessenhuis, Zeist");
+  });
+});
+
+describe("draftSubject", () => {
+  it("names the treatment, which is what an insurer sorts on", () => {
+    expect(draftSubject(row)).toContain("zorgbemiddeling");
+    expect(draftSubject(row)).toContain("knie vervanging");
   });
 });

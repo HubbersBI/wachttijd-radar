@@ -24,7 +24,7 @@ export type DraftInput = {
 };
 
 const PLACEHOLDER_NAME = "[uw naam]";
-const PLACEHOLDER_INSURER = "[naam zorgverzekeraar]";
+const PLACEHOLDER_INSURER = "[uw zorgverzekeraar]";
 
 /** Many location names already carry their city - "Sint Antonius Ziekenhuis Locatie
  *  Utrecht" should not become "..., Utrecht". */
@@ -56,6 +56,11 @@ function normSentence(norm: [number, number], days: number): string {
     `klinische behandeling (42 tot 49 dagen). De gemelde wachttijd ligt boven de norm ` +
     `van 6 weken. De bron vermeldt niet of deze behandeling poliklinisch of klinisch is.`
   );
+}
+
+/** Subject line for the mail. Kept short and specific - it is what an insurer sorts on. */
+export function draftSubject(row: Wachttijd): string {
+  return `Verzoek om zorgbemiddeling - ${row.treatment}`;
 }
 
 export function buildDraft({ row, norm, alternative, name, insurer }: DraftInput): string {

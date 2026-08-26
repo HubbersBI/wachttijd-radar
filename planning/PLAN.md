@@ -159,6 +159,21 @@ norm with the excess computed against the reading that holds either way. Where a
 shorter wait exists elsewhere for the same treatment it cites that too, with its own
 report date - never itself, and never one that is no shorter.
 
+Name and insurer are required, and the insurer is chosen from a list of Dutch labels
+grouped by concern - people know their own brand, but the zorgplicht and the
+bemiddeling desk sit with the concern.
+
+**It is sent by mailto:, not by a backend.** Posting the letter to our own server to
+send would put someone's treatment and their wait through our infrastructure, which
+is the thing the boundary above forbids. Handing it to the person's own mail client
+means it travels from their mailbox to their insurer and never passes through us, and
+it is also how this should work in production rather than only in a demo.
+
+The addresses are fabricated and end in `.invalid`, a suffix reserved by RFC 2606 that
+can never resolve. This is a public repository: without that, a visitor clicking
+through would open a mail client addressed to a real insurer. `DEMO_SUFFIX` in
+`lib/insurers.ts` is the single place to change if real desks are ever wanted.
+
 When the assistant arrives in step 4 it may adjust tone only. The name and insurer are
 inserted after any model call, never sent to one.
 
