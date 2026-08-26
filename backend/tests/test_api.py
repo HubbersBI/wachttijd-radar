@@ -65,3 +65,25 @@ def test_rows_without_a_number_are_kept_and_sorted_last(client):
 
 def test_unknown_treatment_is_a_404(client):
     assert client.get("/api/wachttijden", params={"treatment_key": "nope"}).status_code == 404
+
+
+def test_each_row_carries_its_own_history(client):
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    body = client.get(
+        "/api/wachttijden", params={"treatment_key": treatment["treatment_key"]}
+    ).json()
+    for row in body["results"]:
+        assert len(row["history"]) > 1, "the synthetic source reports a run, not a point"
+        dates = [point["supplied_at"] for point in row["history"]]
+        assert dates == sorted(dates), "history is oldest first"
+
+
+def test_the_latest_history_point_is_the_reported_wait(client):
+    """The row and the end of its own history cannot disagree."""
+    treatment = client.get("/api/treatments").json()["treatments"][0]
+    body = client.get(
+        "/api/wachttijden", params={"treatment_key": treatment["treatment_key"]}
+    ).json()
+    for row in body["results"]:
+        assert row["history"][-1]["days"] == row["days"]
+        assert row["history"][-1]["supplied_at"] == row["supplied_at"]

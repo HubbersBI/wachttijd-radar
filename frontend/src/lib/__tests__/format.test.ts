@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { axisTicks, barWidth, formatDate, formatWait } from "@/lib/format";
+import { axisTicks, barWidth, formatDate, formatTrend, formatWait, trend } from "@/lib/format";
 
 describe("formatDate", () => {
   it("renders the reported date in Dutch", () => {
@@ -41,5 +41,36 @@ describe("axisTicks", () => {
 
   it("survives a list where nothing has a measured wait", () => {
     expect(axisTicks(0)).toEqual([0]);
+  });
+});
+
+describe("trend", () => {
+  const point = (days: number | null, supplied_at: string) => ({
+    days,
+    insufficient_observations: days === null,
+    supplied_at,
+  });
+
+  it("measures from the first report to the last", () => {
+    expect(trend([point(90, "a"), point(120, "b"), point(256, "c")])).toBe(166);
+  });
+
+  it("is null for a single report, which is a point and not a trend", () => {
+    expect(trend([point(90, "a")])).toBeNull();
+  });
+
+  it("is null when only one report carries a number", () => {
+    expect(trend([point(null, "a"), point(90, "b")])).toBeNull();
+  });
+
+  it("skips reports without a number rather than treating them as zero", () => {
+    expect(trend([point(90, "a"), point(null, "b"), point(70, "c")])).toBe(-20);
+  });
+});
+
+describe("formatTrend", () => {
+  it("always shows the direction", () => {
+    expect(formatTrend(166)).toBe("+166 dagen");
+    expect(formatTrend(-22)).toBe("\u221222 dagen");
   });
 });

@@ -18,6 +18,10 @@ const base: Wachttijd = {
   insufficient_observations: false,
   supplied_at: "2026-08-18T08:00:00.000Z",
   fetched_at: "2026-08-26T09:00:00+00:00",
+  history: [
+    { days: 90, insufficient_observations: false, supplied_at: "2026-07-07T08:00:00.000Z" },
+    { days: 68, insufficient_observations: false, supplied_at: "2026-08-18T08:00:00.000Z" },
+  ],
 };
 
 describe("WaitRow", () => {
@@ -44,5 +48,48 @@ describe("WaitRow", () => {
   it("drops the city when the list is already filtered to one", () => {
     render(<WaitRow row={base} longest={256} showCity={false} />);
     expect(screen.queryByText(/Utrecht ·/)).not.toBeInTheDocument();
+  });
+});
+
+describe("WaitRow trend", () => {
+  it("shows the change across the reported run", () => {
+    render(<WaitRow row={base} longest={256} />);
+    expect(screen.getByText("−22 dagen")).toBeInTheDocument();
+  });
+
+  it("shows no trend when there is only one report", () => {
+    const single = { ...base, history: [base.history[1]] };
+    render(<WaitRow row={single} longest={256} />);
+    expect(screen.queryByText(/dagen sinds/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^[+−]\d+ dagen$/)).not.toBeInTheDocument();
+  });
+
+  it("does not invent a trend from reports that carry no number", () => {
+    const gaps = {
+      ...base,
+      history: [
+        { days: null, insufficient_observations: true, supplied_at: "2026-07-07T08:00:00.000Z" },
+        { days: 68, insufficient_observations: false, supplied_at: "2026-08-18T08:00:00.000Z" },
+      ],
+    };
+    render(<WaitRow row={gaps} longest={256} />);
+    expect(screen.queryByText(/^[+−]\d+ dagen$/)).not.toBeInTheDocument();
+  });
+});
+
+describe("WaitRow trend and missing figures", () => {
+  it("shows no trend when the current report has no number", () => {
+    const unknownNow = {
+      ...base,
+      days: null,
+      insufficient_observations: true,
+      history: [
+        { days: 90, insufficient_observations: false, supplied_at: "2026-07-07T08:00:00.000Z" },
+        { days: null, insufficient_observations: true, supplied_at: "2026-08-18T08:00:00.000Z" },
+      ],
+    };
+    render(<WaitRow row={unknownNow} longest={256} />);
+    expect(screen.getByText("onvoldoende waarnemingen")).toBeInTheDocument();
+    expect(screen.queryByText(/dagen/)).not.toBeInTheDocument();
   });
 });

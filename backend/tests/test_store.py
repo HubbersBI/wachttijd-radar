@@ -12,11 +12,24 @@ def test_storing_twice_adds_nothing(tmp_path):
 
 
 def test_a_new_report_date_is_a_new_row(tmp_path):
+    """Each row keeps its own date, shifted - collapsing them all onto one date
+    would merge the reports that make up a history."""
     conn = connect(tmp_path / "test.sqlite")
     rows = SyntheticSource().fetch()
     store(conn, rows)
-    later = [type(row)(**{**row.__dict__, "supplied_at": "2026-09-01T00:00:00Z"}) for row in rows]
+    later = [
+        type(row)(**{**row.__dict__, "supplied_at": row.supplied_at + "-later"}) for row in rows
+    ]
     assert store(conn, later) == len(rows)
+
+
+def test_the_synthetic_source_reports_a_history(tmp_path):
+    """One report per location is a point, not a trend. The demo needs a run."""
+    rows = SyntheticSource(reports=8).fetch()
+    dates = {(row.location_key, row.treatment_key): set() for row in rows}
+    for row in rows:
+        dates[(row.location_key, row.treatment_key)].add(row.supplied_at)
+    assert all(len(seen) == 8 for seen in dates.values())
 
 
 def test_insufficient_rows_are_stored_with_a_null_wait(tmp_path):

@@ -1,5 +1,6 @@
+import { Sparkline } from "@/components/Sparkline";
 import type { Wachttijd } from "@/lib/api";
-import { barWidth, formatDate, formatWait } from "@/lib/format";
+import { barWidth, formatDate, formatTrend, formatWait, trend } from "@/lib/format";
 
 /**
  * One provider on the shared scale.
@@ -24,13 +25,36 @@ export function WaitRow({
   const unknown = row.days === null;
   const width = unknown ? "0%" : barWidth(row.days!, longest);
   const insideBar = !unknown && row.days! / longest > 0.62;
+  // No trend beside a row with no current figure. The earlier reports are real, but
+  // a change shown next to "onvoldoende waarnemingen" reads as movement we cannot
+  // claim: we do not know what the wait is now. The history stays in the API.
+  const change = unknown ? null : trend(row.history);
+  const reports = row.history.length;
 
   return (
     <li className="border-t border-rule py-2.5">
       <div className="flex items-baseline justify-between gap-4">
         <h3 className="truncate text-[14px] leading-tight font-medium">{row.location}</h3>
-        <span className="tabular shrink-0 text-[11px] text-ink-faint">
-          {showCity && `${row.city} · `}gemeld {formatDate(row.supplied_at)}
+        <span className="tabular flex shrink-0 items-center gap-2 text-[11px] text-ink-faint">
+          {change !== null && (
+            <>
+              {/* Neutral in both directions: blue is the measured length, and
+                  overloading it with "getting worse" would spend the one accent twice.
+                  The sign carries the direction. */}
+              <span
+                className="text-ink-dim"
+                title={`${formatTrend(change)} sinds ${formatDate(row.history[0].supplied_at)}, over ${reports} meldingen`}
+              >
+                {formatTrend(change)}
+              </span>
+              <span className="text-ink-faint">
+                <Sparkline history={row.history} />
+              </span>
+            </>
+          )}
+          <span>
+            {showCity && `${row.city} · `}gemeld {formatDate(row.supplied_at)}
+          </span>
         </span>
       </div>
 
