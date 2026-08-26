@@ -1,89 +1,138 @@
 # Wachttijd-radar
 
-Waiting times in Dutch medisch-specialistische zorg, per treatment and per location,
-each figure shown with its source and the date the provider reported it.
+Dutch hospital waiting times, compared per treatment and per location, measured against
+the legal norm — and turned into the request your insurer is obliged to act on.
 
-Same treatment, four hospitals in Utrecht, on one day in August 2026: 30 days, 68
-days, 256 days, and one location with too few observations to report a figure at
-all. Making that comparable is the point.
+![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/01-vergelijking.png)
+
+Four hospitals, one city, one treatment, on a single day in August 2026: **30, 68 and
+256 days** — and one location that reported too few observations to give a figure at
+all. All four are a twenty-minute drive apart.
+
+Waiting times are the most-felt failure of Dutch healthcare, and almost nobody knows
+that exceeding the **treeknorm** gives them the right to free *zorgbemiddeling* from
+their insurer. Comparison sites tell you the number. This one tells you what it means
+and what you can do about it.
+
+---
+
+## What it does
+
+**Compares.** 11,325 waiting times across 335 providers and 811 locations, straight
+from the Nederlandse Zorgautoriteit. Every figure carries the date the provider
+reported it.
+
+**Judges.** Each wait is measured against the treeknorm from NZa policy TH/BR-025. The
+bar turns from green to red where the norm falls, so a list of 116 locations reads as a
+gradient from acceptable to unacceptable without reading a single number.
+
+**Acts.** Any wait past the norm can be turned into a zorgbemiddeling request, drafted
+from the real figures and addressed to the right insurer.
+
+![The drafted zorgbemiddeling request, citing the provider, the wait, the date and the norm](docs/screenshots/02-zorgbemiddeling.png)
+
+**Answers.** A question in plain Dutch — *"MRI heup in Amsterdam binnen 4 weken"* —
+resolves to a treatment, a city and a deadline, and returns rows from the database.
+
+![The assistant panel answering a question in plain Dutch](docs/screenshots/03-zoekhulp.png)
+
+---
+
+## The parts worth looking at
+
+**The data is real, and there is no scraping.** The starting assumption was one
+scraper per hospital website. Checking first turned up an undocumented NZa endpoint
+serving the whole country as JSON, unauthenticated, refreshed every two weeks. The
+research that found it is in [`NOTES.md`](NOTES.md).
+
+**The verdict has three states, because the regulation does.** TH/BR-025 sets six weeks
+for outpatient treatment and seven for inpatient — but NR/REG-2421 art. 4 lid 5 has
+providers submit both as one undifferentiated category. So a wait of 43–49 days is over
+the norm *if* it is outpatient, and within it *if* it is inpatient, and the source does
+not say which. Rather than pick one, the app reports `within`, `depends` or `exceeded`,
+and draws the uncertainty as a striped band. RIVM publishes the same figures the same
+way, for the same reason.
+
+**Absence is data.** A provider reporting too few observations gets no number, no
+verdict, no colour — and keeps its place in the list saying so. It is never quietly
+dropped, never averaged, never shown as a wait of zero. Several tests exist only to
+enforce this.
+
+**The request never reaches the server.** A zorgbemiddeling draft names someone's
+treatment and their wait: health data under AVG art. 9. It is built in the browser and
+handed to the person's own mail client, so their name and insurer never touch the
+backend. That is a guarantee rather than a retention policy.
+
+**The assistant cannot give medical advice.** It only emits a structured query —
+treatment, city, deadline — and the answer is rendered from the database. A model with
+no channel for prose cannot diagnose however it is asked, and cannot round a figure it
+never sees. Without an API key the same parse runs on rules, so the app demos and tests
+with no network.
+
+---
+
+## Stack
+
+FastAPI + uv (Python 3.12) · Next.js 16 static export + React 19 + Tailwind 4 ·
+SQLite · Docker, one image, one port · pytest + vitest, 104 tests · Groq for the
+assistant, optional.
 
 ## Run it
 
 ```bash
-docker compose up --build -d          # http://localhost:8000
-WACHTTIJD_PORT=8001 docker compose up -d   # if 8000 is taken
+docker compose up --build -d      # http://localhost:8000
 ```
 
-Or the scripts, which are safe to run repeatedly:
+First start fetches once from the NZa API into a named volume; later starts reuse it.
+There are idempotent start/stop scripts for Windows and macOS in [`scripts/`](scripts).
+No API key is needed for anything.
 
-```powershell
-.\scripts\start_windows.ps1 [-Port 8001] [-Synthetic]
-.\scripts\stop_windows.ps1 [-RemoveData]
-```
+---
 
-```bash
-./scripts/start_mac.sh [--port 8001] [--synthetic]
-./scripts/stop_mac.sh [--remove-data]
-```
+## How this was built
 
-The first start fetches once from the NZa API into a named volume. Later starts
-reuse it. `--synthetic` runs the demo with generated data, in a separate database
-file so invented numbers can never mix with reported ones.
+Written with **Claude Code (Opus 5)** in a single session, and the way it was run
+matters more than the fact that it was:
 
-## Develop
+**Small increments, each one verified before the next.** Fetch → store → API → screen →
+container → norm check → request → assistant. Every step ended with tests passing and
+the real thing running against real data, not with a claim that it should work.
 
-```bash
-cd backend  && uv run -m app.fetch && uv run uvicorn app.main:app --port 8000
-cd frontend && npm run build     # or npm run dev for hot reload on :3000
-```
+**Reviewed and redirected continuously.** I read the diffs and pushed back, and several
+things changed or came out because of it. A trend-over-time view was built, shipped and
+then reverted as noise. Bar colours were toned down. The assistant moved from a block in
+the page into a slide-out panel. The DigiD-style login in the original plan was dropped
+once it became clear it would gate nothing. The reversals are in the git history rather
+than tidied away.
 
-Tests: `uv run --extra dev pytest` and `npm run test`.
+**No subagents and no agent teams.** One session, direct edits, reviewed as they
+happened. This was a project where every decision needed a person in the loop rather
+than parallel work.
 
-## Data
+**Decisions recorded as they were made.** [`NOTES.md`](NOTES.md) holds the research and
+the open questions, [`planning/PLAN.md`](planning/PLAN.md) the shape of the build, and
+[`CLAUDE.md`](CLAUDE.md) the rules the code must not break — including one that was
+deliberately relaxed to build the assistant, with the reason and the date written down.
 
-Waiting times come from the [NZa Zorgbeeld open API](https://zorgbeeld.nza.nl/rest-doc/openapi),
-refreshed biweekly. Every figure is a median in days as reported by the provider,
-and is shown with the date it was reported. A location with insufficient
-observations is listed as such, never as a wait of zero.
+**Bugs are in the log with their causes.** A ruler whose axis and bars used different
+widths. A 500 on any deadline nothing met. A `.gitignore` rule that silently excluded
+three source files. Each was found by looking at the running thing rather than trusting
+the code, and each commit message says how.
 
-Ggz waiting times are not included: there is no NZa endpoint for them, and the 2026
-transition to declaratiedata makes published figures unreliable. See `NOTES.md`.
+---
 
 ## Scope
 
-This app **navigates and drafts — it does not diagnose.** There is no symptom
-checker, no triage, and no advice about what care someone needs. Anything of that
-kind would move the app toward medical-device territory under the MDR and into
-high-risk territory under the EU AI Act, which is a line this project stays well
-clear of by design.
+**Navigation and drafting, not diagnosis.** No symptom checker, no triage, no advice
+about what care someone needs — that would move the app toward medical-device territory
+under the MDR and high-risk territory under the EU AI Act.
 
-It uses public aggregate data only. No patient data, ever.
+**Public aggregate data only**, no accounts and no login. Nothing in the app is
+per-person, so there is nothing to store and nothing to log in to.
 
-**There is no login.** Nothing in the app is per-person: you pick a treatment and read
-a comparison, and a zorgbemiddeling request is a form filled fresh each time and never
-kept. A login would have gated nothing. It was in the original plan as a DigiD-style
-demo and was dropped once it became clear it had no job to do.
+**Ggz is deliberately out.** There is no NZa endpoint for it, and the 2026 transition to
+declaratiedata makes published figures unreliable. The conditions for adding it are
+written down.
 
-### Why there are no accounts, and no crowdsourced waiting times
-
-The obvious next feature is to let people report what they actually waited and
-compare it against what providers report. It is deliberately not built.
-
-Collecting that turns an app over public aggregate data into a register of
-identified people and their medical waits - special category data under AVG art. 9,
-and the Dutch DPA's top enforcement priority. That is a different project, with a
-DPIA, a legal basis and a retention policy, not a feature.
-
-The comparison would also mislead. The NZa figure is a median of waits that
-**completed**. Anyone volunteering "I have been waiting 200 days" is by definition
-still waiting, so responses are drawn from the long tail. Length-biased sampling
-makes self-reported waits look systematically worse than reported ones even when
-every provider reports honestly.
-
-The same reasoning rules out accounts generally. A saved watch on a treatment reveals
-someone's medical situation just as plainly as the assistant's question box does. The
-difference is that the question is transient - answered, shown, and gone - while a
-watch has to be stored against a person to be a watch at all. Storing it is the part
-this app does not do.
-
-`CLAUDE.md` holds the full invariants and `planning/PLAN.md` the shape of the build.
+Demo email addresses end in `.invalid` and cannot resolve, so nothing here can reach a
+real insurer.
