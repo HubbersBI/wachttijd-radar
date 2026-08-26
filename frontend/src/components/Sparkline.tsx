@@ -39,7 +39,6 @@ export function Sparkline({
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className="overflow-visible"
       aria-hidden="true"
     >
       <polyline

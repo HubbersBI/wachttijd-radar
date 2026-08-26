@@ -93,3 +93,25 @@ describe("WaitRow trend and missing figures", () => {
     expect(screen.queryByText(/dagen/)).not.toBeInTheDocument();
   });
 });
+
+describe("WaitRow trend context", () => {
+  it("names the period the change was measured over", () => {
+    render(<WaitRow row={base} longest={256} />);
+    expect(screen.getByText("\u221222 dagen")).toBeInTheDocument();
+    expect(screen.getByText("sinds 7 jul 2026")).toBeInTheDocument();
+  });
+
+  it("dates the period from the first report that carried a number", () => {
+    const leadingGap = {
+      ...base,
+      history: [
+        { days: null, insufficient_observations: true, supplied_at: "2026-06-01T08:00:00.000Z" },
+        { days: 90, insufficient_observations: false, supplied_at: "2026-07-07T08:00:00.000Z" },
+        { days: 68, insufficient_observations: false, supplied_at: "2026-08-18T08:00:00.000Z" },
+      ],
+    };
+    render(<WaitRow row={leadingGap} longest={256} />);
+    expect(screen.getByText("sinds 7 jul 2026")).toBeInTheDocument();
+    expect(screen.queryByText("sinds 1 jun 2026")).not.toBeInTheDocument();
+  });
+});
