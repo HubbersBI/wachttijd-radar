@@ -15,6 +15,9 @@ services:
     environment:
       # Set to "synthetic" to run the demo without calling the NZa API.
       WACHTTIJD_SOURCE: "${WACHTTIJD_SOURCE:-nza}"
+      # Optional: without a key the assistant falls back to rule-based matching.
+      GROQ_API_KEY: "${GROQ_API_KEY:-}"
+      GROQ_MODEL: "${GROQ_MODEL:-llama-3.3-70b-versatile}"
     volumes:
       - wachttijd-radar-data:/app/db
     restart: unless-stopped

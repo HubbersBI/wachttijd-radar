@@ -78,6 +78,18 @@ def _row(row: sqlite3.Row) -> dict:
     return out
 
 
+def cities(conn: sqlite3.Connection) -> list[str]:
+    """Every city with a reported location, longest name first.
+
+    Longest first so "Bergen op Zoom" is matched before "Bergen" when reading a
+    question.
+    """
+    rows = conn.execute(
+        "SELECT DISTINCT city FROM wachttijd WHERE city IS NOT NULL ORDER BY LENGTH(city) DESC"
+    )
+    return [row["city"] for row in rows]
+
+
 def data_freshness(conn: sqlite3.Connection) -> dict:
     """What the database holds and when it was pulled.
 

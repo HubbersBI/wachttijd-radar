@@ -4,8 +4,9 @@ from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
-from . import queries, treeknorm
+from . import assistant, queries, treeknorm
 from .store import connect
 
 # The built frontend: `backend/static` in the image, `frontend/out` in a checkout.
@@ -64,6 +65,57 @@ def wachttijden(
     found = queries.wachttijden(conn, treatment_key, city)
     if not found:
         raise HTTPException(status_code=404, detail="No waiting times for that treatment")
+    return _answer(found, treatment_key, city, max_days)
+
+
+class AssistantQuestion(BaseModel):
+    question: str = Field(min_length=2, max_length=300)
+
+
+@app.post("/api/assistant")
+def ask(body: AssistantQuestion, conn=Depends(get_conn)) -> dict:
+    """Answer a question in plain Dutch with rows from the database.
+
+    The model only picks the treatment, the city and the deadline; every figure in the
+    answer is read from the table. The question is never logged or stored.
+    """
+    understood = assistant.parse(
+        body.question, queries.treatments(conn), queries.cities(conn)
+    )
+    answer: dict = {
+        "understood": {
+            "treatment_key": understood.treatment_key,
+            "city": understood.city,
+            "max_days": understood.max_days,
+            "within_norm": understood.within_norm,
+            "read_by": understood.source,
+        }
+    }
+    if not understood.treatment_key:
+        answer["error"] = "Ik kon er geen behandeling in herkennen."
+        return answer
+
+    found = queries.wachttijden(conn, understood.treatment_key, understood.city)
+    if not found:
+        answer["error"] = (
+            f"Geen locaties gevonden voor deze behandeling"
+            f"{f' in {understood.city}' if understood.city else ''}."
+        )
+        return answer
+
+    # "binnen de treeknorm" is a deadline too, but which one depends on the treatment,
+    # so it can only be resolved now that the treatment is known.
+    max_days = understood.max_days
+    norm = treeknorm.norm_for(found[0]["treatment_type"])
+    if max_days is None and understood.within_norm and norm:
+        max_days = norm[0]
+        answer["understood"]["max_days"] = max_days
+
+    answer["answer"] = _answer(found, understood.treatment_key, understood.city, max_days)
+    return answer
+
+
+def _answer(found: list[dict], treatment_key: str, city: str | None, max_days: int | None) -> dict:
     treatment_type = found[0]["treatment_type"]
 
     # A location that reported no figure cannot be said to meet a deadline, so it is
