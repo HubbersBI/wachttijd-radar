@@ -6,7 +6,7 @@ Dutch hospital waiting times, compared per treatment and per location, measured 
 the legal norm — and turned into the formal request your insurer is obliged to act on.
 
 `FastAPI + Next.js` · `11,325 live records from the Nederlandse Zorgautoriteit` ·
-`natural-language search` · `one Docker command` · `104 tests`
+`natural-language search` · `one Docker command` · `132 tests`
 
 ![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/01-vergelijking.png)
 
@@ -63,7 +63,7 @@ deadline — and never prose, so it cannot invent a figure or give medical advic
 zorgbemiddeling letter is built in the browser and handed to the person's own mail
 client, so a name and insurer never reach the backend.
 
-**Tested and runnable.** 104 tests across backend and frontend, several of which exist
+**Tested and runnable.** 132 tests across backend and frontend, several of which exist
 only to enforce the honesty rules above. One command starts it, and it seeds itself
 from the live API on first boot.
 
@@ -73,7 +73,7 @@ from the live API on first boot.
 
 FastAPI + uv (Python 3.12) · Next.js 16 static export + React 19 + Tailwind 4 ·
 SQLite · Docker, one image, one port · pytest + vitest · Groq for the assistant,
-optional.
+optional · published serverless to static hosting, rebuilt by GitHub Actions.
 
 ## Run it
 
@@ -84,6 +84,32 @@ docker compose up --build -d      # http://localhost:8000
 First start fetches once from the NZa API into a named volume; later starts reuse it.
 There are idempotent start/stop scripts for Windows and macOS in [`scripts/`](scripts).
 No API key is needed for anything.
+
+## Publish it
+
+The deployed site has **no backend at all**. Every read endpoint returns the same thing
+between two fetches — the figures change biweekly and the API only ever returns *now* —
+so they are written out as flat JSON at build time and the frontend reads those files.
+The exporter calls the same queries the API does, and a test asserts the two are equal
+file for response, because a figure assembled twice is a figure that will eventually be
+assembled two different ways.
+
+```bash
+./scripts/build_static_mac.sh --refresh      # or scriptsuild_static_windows.ps1 -Refresh
+```
+
+`.github/workflows/deploy.yml` does the same on push and twice a month, which is how the
+figures stay current without a process staying alive.
+
+**This is also what makes the assistant private.** A backend on the public internet
+would mean a model key in a serverless function, and strangers' health questions
+travelling to a vendor with no processor agreement. So the rules parser was ported to
+TypeScript and runs in the browser: the question never leaves the page, and there is
+nothing to log because there is nowhere for it to go. Both parsers are held to the same
+test cases so they cannot drift.
+
+The site is `noindex`, and says what it is before it is used — a portfolio build over a
+snapshot, with a link to ZorgkaartNederland for anyone who needs a real waiting time.
 
 ---
 

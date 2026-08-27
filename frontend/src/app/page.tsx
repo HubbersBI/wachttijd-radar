@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AssistantDrawer } from "@/components/AssistantDrawer";
 import { Controls } from "@/components/Controls";
+import { DemoBadge, DemoNotice } from "@/components/DemoNotice";
 import { DirectRequest } from "@/components/DirectRequest";
 import { Scale } from "@/components/Scale";
 import { WaitRow } from "@/components/WaitRow";
@@ -61,15 +62,20 @@ export default function Page() {
 
   return (
     <div className="mx-auto min-h-screen max-w-4xl px-6 pb-24">
+      <DemoNotice />
+
       <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-ink py-4">
         <span className="text-[13px] font-semibold tracking-[0.2em] uppercase">
           Wachttijd-radar
         </span>
-        {health?.fetched_at && (
-          <span className="tabular text-[11px] text-ink-dim">
-            Bron: Nederlandse Zorgautoriteit &middot; opgehaald {formatDate(health.fetched_at)}
-          </span>
-        )}
+        <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <DemoBadge />
+          {health?.fetched_at && (
+            <span className="tabular text-[11px] text-ink-dim">
+              Bron: Nederlandse Zorgautoriteit &middot; opgehaald {formatDate(health.fetched_at)}
+            </span>
+          )}
+        </span>
       </header>
 
       <section className="pt-10 pb-6">
