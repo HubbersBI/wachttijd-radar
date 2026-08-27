@@ -36,6 +36,10 @@ and the Vektis non-commercial terms are acceptable for whatever the app has beco
    scroll past the other. The page stays usable behind it, so it is not a modal and
    does not trap focus. Escape closes it.
 
+5. **Publishing it.** Done. The app is served as a static site with no backend: the
+   read endpoints are written out as flat JSON at build time and a scheduled workflow
+   rebuilds them. See "Deployment" below for why that shape, and what it costs.
+
 **There is no login, and there is not going to be one.** Dropped on 2026-08-26. It was
 in the original notes as a requirement without a reason, and once the reason was asked
 for there was not one: nothing in this app is per-person. You pick a treatment and read
@@ -211,6 +215,49 @@ insufficient observations appear in the list and say so, rather than vanishing.
 That is the whole of v1's UI. Everything else is added on top of a screen that
 already tells the truth.
 
+## Deployment
+
+Published as a **static site with no backend**, from the same codebase that runs in
+Docker. `WACHTTIJD_SOURCE` still selects the adapter; `NEXT_PUBLIC_WACHTTIJD_STATIC`
+selects how the frontend reads.
+
+```
+NZa API ──fetch──> SQLite ──export_static──> flat JSON ──next build──> static host
+        (scheduled, twice a month, in CI)
+```
+
+Three reasons this shape rather than a hosted container:
+
+- **It is what the data is.** Every read endpoint returns the same thing between two
+  fetches. A process kept alive to re-run the same query over an unchanging table is
+  a process kept alive for nothing.
+- **It removes the last compliance gap.** A backend on the public internet means either
+  a model key in a serverless function - strangers' health questions going to a vendor
+  with no processor agreement - or no assistant. Neither was acceptable. The rules
+  parser moved into the browser instead (`lib/assistant.ts`, a port of
+  `parse_with_rules`), so the question never leaves the page. There is nothing to log
+  because there is nowhere for it to go.
+- **Free tiers that keep a container warm mostly do not.** The ones that are free spin
+  down when idle, and the first visitor of the day waits out a cold start.
+
+What it costs, recorded honestly:
+
+- **Freshness is a build, not a request.** Figures are as old as the last successful
+  workflow run. `fetched_at` is on the page, which is what makes that honest rather
+  than hidden.
+- **Snapshot history depends on the CI cache.** The table still accumulates one row per
+  (location, treatment, supplied_at), and the workflow carries the database between
+  runs, but a cache eviction resets that history. No screen shows history in v1, so
+  nothing visible is lost - only the record.
+- **The assistant is rules-only when published.** No model, and it says so on screen:
+  "Gelezen zonder taalmodel." The Docker build still takes a `GROQ_API_KEY`.
+
+**The site is `noindex`, and says what it is before it is used.** A modal notice on
+first visit, a marker in the header after that, both linking to ZorgkaartNederland for
+someone who needs a real waiting time. The figures are genuine but the site is a
+portfolio build over a snapshot; a visitor arriving from a search result has no way to
+know that unless it is said.
+
 ## Adapters
 
 One interface, two implementations, selected by environment variable:
@@ -234,6 +281,9 @@ Environment:
 | `WACHTTIJD_DB_DIR` | `db/` | Directory for the database; the volume in the container |
 | `WACHTTIJD_DB` | unset | Full path override, wins over both |
 | `WACHTTIJD_PORT` | `8000` | Host port for docker compose |
+| `GROQ_API_KEY` | unset | Docker build only. Unset, the assistant runs on rules |
+| `NEXT_PUBLIC_WACHTTIJD_STATIC` | unset | `true` builds the serverless site: flat JSON, no backend |
+| `NEXT_PUBLIC_BASE_PATH` | empty | Subdirectory the site is served from, for a Pages project site |
 
 ## Hard boundaries
 

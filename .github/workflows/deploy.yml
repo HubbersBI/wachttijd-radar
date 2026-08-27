@@ -1,0 +1,115 @@
+name: Deploy to GitHub Pages
+
+# The published site is static: the figures are written to flat JSON at build time
+# and there is no backend in front of them. So a deploy is a fetch plus a build, and
+# keeping the figures current means running it on a schedule rather than keeping a
+# server alive.
+on:
+  push:
+    branches: [main]
+  schedule:
+    # The NZa refreshes biweekly, so twice a month is the cadence that matches the
+    # source. More often would be pointless load on someone else's open API.
+    - cron: "0 6 1,15 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A scheduled refresh and a push should not race each other onto the same site.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Pinned exactly: setup-uv publishes no moving major tag, so @v10 does not
+      # resolve. Bump this by hand.
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: true
+          working-directory: backend
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # The table is a history: one row per (location, treatment, supplied_at). Carried
+      # between runs so re-fetching an unchanged figure stays the no-op it is meant to
+      # be, and so the record of past reports accumulates rather than starting empty
+      # every deploy. Losing the cache costs nothing but that history - the site only
+      # ever shows the latest report.
+      - name: Restore the database
+        uses: actions/cache@v6
+        with:
+          path: db
+          key: wachttijden-db-${{ github.run_id }}
+          restore-keys: wachttijden-db-
+
+      - name: Fetch the latest waiting times
+        working-directory: backend
+        run: uv run python -m app.fetch --refresh
+
+      - name: Write the API out as static JSON
+        working-directory: backend
+        run: uv run python -m app.export_static --out ../frontend/public/api
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Test
+        working-directory: frontend
+        run: npm test -- --run
+
+      # A Pages project site is served from /<repo>, so every asset and every JSON
+      # path needs that prefix. A user site and a custom domain are served from the
+      # root and need none. Set the repository variable PAGES_BASE_PATH to " " (a
+      # single space) to force it empty when a custom domain is added.
+      - name: Work out the base path
+        run: |
+          override='${{ vars.PAGES_BASE_PATH }}'
+          repo="${GITHUB_REPOSITORY#*/}"
+          owner="${GITHUB_REPOSITORY%%/*}"
+          if [ -n "$override" ]; then
+            base="$(echo "$override" | tr -d '[:space:]')"
+          elif [ "$(echo "$repo" | tr '[:upper:]' '[:lower:]')" = "$(echo "$owner" | tr '[:upper:]' '[:lower:]').github.io" ]; then
+            base=""
+          else
+            base="/$repo"
+          fi
+          echo "Base path: '${base}'"
+          echo "NEXT_PUBLIC_BASE_PATH=${base}" >> "$GITHUB_ENV"
+
+      - name: Build
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_WACHTTIJD_STATIC: "true"
+        run: npm run build
+
+      # Pages skips directories beginning with an underscore unless this is present,
+      # which would drop the whole of _next and serve an unstyled page.
+      - name: Disable Jekyll
+        run: touch frontend/out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: frontend/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

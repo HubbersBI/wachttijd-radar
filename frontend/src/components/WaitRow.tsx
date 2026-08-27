@@ -81,7 +81,7 @@ export function WaitRow({
         )}
 
         <span
-          className={`tabular absolute top-1/2 z-20 flex -translate-y-1/2 items-baseline gap-2 px-2 text-[12px] whitespace-nowrap ${
+          className={`tabular absolute top-1/2 z-20 flex h-4 -translate-y-1/2 items-baseline gap-2 px-2 text-[12px] leading-4 whitespace-nowrap ${
             insideBar ? `${insideGround} text-paper` : "bg-paper text-ink"
           }`}
           style={insideBar ? { right: `calc(100% - ${labelLeft})` } : { left: labelLeft }}

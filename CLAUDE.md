@@ -35,7 +35,14 @@ These are not preferences. Breaking one makes the app misleading or unlawful.
 - **The user is the health-data risk, not the source.** Anything someone types
   about their own situation is a bijzonder persoonsgegeven under AVG art. 9, and
   the AP treats health data as top enforcement priority. Two consequences:
-  - **The question reaches the model; nothing else does.** This rule used to say
+  - **The published site sends the question nowhere at all.** Decided 2026-08-27,
+    when the app was deployed publicly. The served build has no backend and no
+    model: the rules parser runs in the browser, so a question typed by a stranger
+    never leaves the page. That closes the open gap below rather than managing it,
+    and it is why the public deployment is static rather than a serverless function
+    holding a key. See "Hosting" below.
+  - **The question reaches the model; nothing else does.** Applies to the Docker
+    build, where a `GROQ_API_KEY` may be set. This rule used to say
     no free text ever reached it. That was lifted deliberately on 2026-08-26 so
     the assistant could answer "MRI heup in Amsterdam binnen 4 weken", which is
     the feature. What replaced it still holds absolutely:
@@ -45,10 +52,10 @@ These are not preferences. Breaking one makes the app misleading or unlawful.
     - **Nothing accompanies the question.** No name, no insurer, no draft, no
       identifier, no session. One sentence, and the treatment catalogue.
     - **The question is never logged or stored**, here or anywhere downstream.
-    - Open and unresolved: there is no processor agreement with Groq, and free
-      tiers commonly reserve the right to train on what they receive. That is a
-      real gap, accepted knowingly for a portfolio project. It would have to be
-      closed before this served anyone real.
+    - There is no processor agreement with Groq, and free tiers commonly reserve
+      the right to train on what they receive. That gap was accepted knowingly
+      while this ran only on localhost. **It is not accepted on the public site**,
+      which is why that build carries no key and calls no model at all.
   - **Drafts are not persisted.** A zorgbemiddeling draft names someone's
     treatment and their wait; it *is* health data about them. Render it, let them
     copy it, discard it. Do not log it, store it, or attach it to an error report.
@@ -100,6 +107,34 @@ that, and do not accuse a hospital of breaking a rule it is not bound by.
 Respect the source: rate-limit, cache to disk, identify the client with a real
 User-Agent. Never hammer the API in a loop during development; work from the
 cached snapshot.
+
+## Hosting
+
+Two builds out of one codebase, and they must agree on every figure.
+
+- **Docker** — FastAPI serving `/api` and the export on one port. The development and
+  demo path, unchanged. A `GROQ_API_KEY` may be set here.
+- **Static** — `NEXT_PUBLIC_WACHTTIJD_STATIC=true`. `app/export_static.py` writes the
+  read endpoints out as flat JSON at build time and the frontend reads those files.
+  No server, no key, no model. This is what is published.
+
+The static build is possible because every read endpoint answers the same thing between
+two fetches: the figures change biweekly and the API only ever returns now. Freshness
+is a scheduled rebuild (`.github/workflows/deploy.yml`), not a live process.
+
+**The exporter must never assemble a figure itself.** It calls the same `queries` and
+`main._answer` the API does. A number built twice will eventually be built two
+different ways, and then the published site is quietly lying about a wait.
+`tests/test_export_static.py` asserts file-for-response equality; do not weaken it.
+
+Two things follow for the published build and are load-bearing, not incidental:
+
+- The assistant runs `lib/assistant.ts`, a port of `parse_with_rules`. Both are held to
+  the same cases (`backend/tests/test_assistant.py`, `lib/__tests__/assistant.test.ts`);
+  if one gains a case the other needs it too.
+- The site is `noindex`. It is a portfolio build over a snapshot, and someone arriving
+  from a search result rather than a portfolio would take it for a service. The
+  demo notice says the same thing in the interface and links to ZorgkaartNederland.
 
 ## Stack
 
