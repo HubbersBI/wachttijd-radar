@@ -88,7 +88,7 @@ export function DemoNotice() {
         className="max-h-full w-full max-w-lg overflow-y-auto border border-ink bg-paper px-6 py-6"
       >
         <p className="tabular text-[11px] tracking-[0.2em] text-ink-dim uppercase">
-          Portfolio-demo
+          Portfolio-demo &middot; J. Hubbers &middot; augustus 2026
         </p>
         <h2
           id="demo-notice-title"
@@ -153,6 +153,7 @@ export function DemoBadge() {
   return (
     <span className="tabular text-[11px] text-ink-dim">
       <span className="border border-rule-hi px-1.5 py-0.5">Portfolio-demo</span>{" "}
+      <span className="text-ink-faint">door J. Hubbers &middot; augustus 2026 &middot;</span>{" "}
       <a
         href={ZORGKAART}
         target="_blank"

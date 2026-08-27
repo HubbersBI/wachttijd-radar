@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { DemoNotice, ZORGKAART } from "@/components/DemoNotice";
+import { DemoBadge, DemoNotice, ZORGKAART } from "@/components/DemoNotice";
 
 describe("DemoNotice", () => {
   beforeEach(() => localStorage.clear());
@@ -30,6 +30,17 @@ describe("DemoNotice", () => {
     first.unmount();
     render(<DemoNotice />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("is attributed and dated, in the dialog and in the badge", async () => {
+    const { unmount } = render(<DemoNotice />);
+    await screen.findByRole("dialog");
+    expect(screen.getByText(/J\. Hubbers/)).toBeInTheDocument();
+    expect(screen.getByText(/augustus 2026/)).toBeInTheDocument();
+    unmount();
+
+    render(<DemoBadge />);
+    expect(screen.getByText(/J\. Hubbers/)).toBeInTheDocument();
   });
 
   it("closes on Escape", async () => {
