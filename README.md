@@ -3,20 +3,22 @@
 ### [Open the live site](https://hubbersbi.github.io/wachttijd-radar/)
 
 Nothing to install and no sign-up: pick a treatment and a place, and compare what
-hospitals actually reported. It is a portfolio demo over real NZa figures, so it says
-so on arrival and links to ZorgkaartNederland for anyone who needs a current wait.
+hospitals and clinics actually reported. It is a portfolio demo over real NZa figures,
+so it says so on arrival and links to ZorgkaartNederland for anyone who needs a
+current wait.
 
 **Full-stack web app on live government data, with an AI assistant.**
 
-Dutch hospital waiting times, compared per treatment and per location, measured against
-the legal norm — and turned into the formal request your insurer is obliged to act on.
+Waiting times at Dutch hospitals and independent clinics, compared per treatment and
+per location, measured against the legal norm — and turned into the formal request
+your insurer is obliged to act on.
 
 `FastAPI + Next.js` · `11,325 live records from the Nederlandse Zorgautoriteit` ·
 `natural-language search` · `one Docker command` · `132 tests`
 
 ![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/01-vergelijking.png)
 
-Four hospitals, one city, one treatment, on a single day in August 2026: **30, 68 and
+Four providers, one city, one treatment, on a single day in August 2026: **30, 68 and
 256 days** — and one location that reported too few observations to give a figure at
 all. All four are a twenty-minute drive apart.
 
