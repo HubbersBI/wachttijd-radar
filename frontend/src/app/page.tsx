@@ -80,7 +80,7 @@ export default function Page() {
 
       <section className="pt-10 pb-6">
         <h1 className="max-w-3xl text-[clamp(1.6rem,3.2vw,2.3rem)] leading-[1.12] font-semibold tracking-[-0.02em]">
-          Wachttijden in de ziekenhuiszorg, per behandeling en per locatie
+          Wachttijden in de medisch-specialistische zorg, per behandeling en per locatie
         </h1>
         <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-dim">
           Ziekenhuizen en klinieken melden hun wachttijden aan de Nederlandse

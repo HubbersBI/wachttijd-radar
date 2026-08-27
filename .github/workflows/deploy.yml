@@ -7,6 +7,14 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    # Documentation does not reach the published site, and a full run re-fetches
+    # from someone else's open API. A README edit should not cost the NZa a
+    # request or cost a deploy.
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "planning/**"
+      - "LICENSE"
   schedule:
     # The NZa refreshes biweekly, so twice a month is the cadence that matches the
     # source. More often would be pointless load on someone else's open API.

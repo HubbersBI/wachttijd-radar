@@ -1,5 +1,7 @@
 # Wachttijd radar
 
+*Portfolio demo by J. Hubbers — August 2026*
+
 ### [Open the live site](https://hubbersbi.github.io/wachttijd-radar/)
 
 Nothing to install and no sign-up: pick a treatment and a place, and compare what
