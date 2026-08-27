@@ -1,5 +1,11 @@
 # Wachttijd radar
 
+### [Open the live site](https://hubbersbi.github.io/wachttijd-radar/)
+
+Nothing to install and no sign-up: pick a treatment and a place, and compare what
+hospitals actually reported. It is a portfolio demo over real NZa figures, so it says
+so on arrival and links to ZorgkaartNederland for anyone who needs a current wait.
+
 **Full-stack web app on live government data, with an AI assistant.**
 
 Dutch hospital waiting times, compared per treatment and per location, measured against
@@ -60,6 +66,9 @@ There are idempotent start/stop scripts for Windows and macOS in [`scripts/`](sc
 No API key is needed for anything.
 
 ## Publish it
+
+Deployed at **<https://hubbersbi.github.io/wachttijd-radar/>**, rebuilt by GitHub
+Actions on every push and twice a month.
 
 The deployed site has **no backend at all**. Every read endpoint returns the same thing
 between two fetches — the figures change biweekly and the API only ever returns *now* —
