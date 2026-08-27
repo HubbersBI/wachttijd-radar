@@ -13,7 +13,7 @@ Waiting times at Dutch hospitals and independent clinics, compared per treatment
 per location, measured against the legal norm — and turned into the formal request
 your insurer is obliged to act on.
 
-`FastAPI + Next.js` · `11,325 live records from the Nederlandse Zorgautoriteit` ·
+`FastAPI + Next.js` · `~11,300 live records from the Nederlandse Zorgautoriteit` ·
 `natural-language search` · `one Docker command` · `132 tests`
 
 ![Waiting times for a knee replacement in Utrecht, compared against the treeknorm](docs/screenshots/01-vergelijking.png)
@@ -31,13 +31,14 @@ and what you can do about it.
 
 ## What it does
 
-**Compares.** 11,325 waiting times across 335 providers and 811 locations, straight
-from the Nederlandse Zorgautoriteit. Every figure carries the date the provider
-reported it.
+**Compares.** Around 11,300 waiting times across 335 providers and 811 locations,
+straight from the Nederlandse Zorgautoriteit, refetched twice a month. Every figure
+carries the date the provider reported it, and the page carries the date they were
+pulled.
 
 **Judges.** Each wait is measured against the treeknorm from NZa policy TH/BR-025. The
-bar turns from green to red where the norm falls, so a list of 116 locations reads as a
-gradient from acceptable to unacceptable without reading a single number.
+bar turns from green to red where the norm falls, so a list of a hundred-odd locations
+reads as a gradient from acceptable to unacceptable without reading a single number.
 
 **Acts.** Any wait past the norm can be turned into a zorgbemiddeling request, drafted
 from the real figures and addressed to the right insurer.
@@ -46,6 +47,9 @@ from the real figures and addressed to the right insurer.
 
 **AI assistant.** A question in plain Dutch — *"MRI heup in Amsterdam binnen 4 weken"* —
 resolves to a treatment, a city and a deadline, and returns rows from the database.
+The model only ever emits that query; every figure in the answer comes from the
+table. On the published site the same parse runs on rules in the browser, with no
+model and no key, and the panel says so.
 
 ![The assistant panel answering a question in plain Dutch](docs/screenshots/03-zoekhulp.png)
 
@@ -100,12 +104,13 @@ snapshot, with a link to ZorgkaartNederland for anyone who needs a real waiting 
 
 ## How this was built
 
-Written with **Claude Code (Opus 5)** in a single session, and the way it was run
-matters more than the fact that it was:
+Written with **Claude Code (Opus 5)**, and the way it was run matters more than the
+fact that it was:
 
 **Small increments, each one verified before the next.** Fetch → store → API → screen →
-container → norm check → request → assistant. Every step ended with tests passing and
-the real thing running against real data, not with a claim that it should work.
+container → norm check → request → assistant → published with no backend. Every step
+ended with tests passing and the real thing running against real data, not with a
+claim that it should work.
 
 **No subagents and no agent teams.** One session, direct edits, reviewed as they
 happened. This was a project where every decision needed a person in the loop rather
